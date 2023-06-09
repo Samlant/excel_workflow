@@ -8,12 +8,31 @@ from datetime import datetime
 from openpyxl import Workbook, load_workbook
 
 
+
+# class Presenter:
+#     def __init__(self):
+#         pass
+#         #dir_watch = DirWatch()
+#         #assume we create method to keep dir_watch constantly running while returning notice a file has been added
+#         # action = notice received
+#         if notice_received:
+#             dialog = DialogNewFile()
+#             if dialog.mainloop() == 'submit':
+#                 pass
+#             elif dialog.mainloop == 'only create folder':
+#                 pass
+#             elif dialog.mainloop == 'allocate':
+#                 pass
+#             else:
+#                 raise ValueError("DialogNewFile return value does not match with Presenter's values")
+            
+
 class DirWatch:
     def __init__(self):
-        self.begin_watch()
+        self._begin_watch()
 
-    def begin_watch(self) -> None:
-        path_to_watch = "."
+    def _begin_watch(self) -> None:
+        path_to_watch = '.'
         before = dict([(f, None) for f in os.listdir(path_to_watch)])
         while 1:
             time.sleep(10)
@@ -21,53 +40,56 @@ class DirWatch:
             added = [f for f in after if not f in before]
             if added:
                 new_file = added[0]
-                dialog = dialog_new_file(new_file)
+                dialog = DialogNewFile(new_file)
                 dialog.root.mainloop()
                 before = dict([(f, None) for f in os.listdir(path_to_watch)])
 
 
-class dialog_allocate_markets:
+class DialogAllocateMarkets:
     def __init__(self):
-        class dialog_new_file:
-        self.initialize()
+        self._initialize()
 
-    def initialize(self):
+    def _initialize(self):
         self.root = Tk()
-        self.root.geometry("250x190")
-        self.root.title("How to Proceed?")
+        self.root.geometry('250x190')
+        self.root.title('How to Proceed?')
         self.root.frame = Frame(self.root)
         self.root.frame.pack(fill=BOTH, expand=False)
-    
-    
+        self._create_widgets()
+
+    def _create_widgets(self):
+        pass
 
 
-class dialog_new_file:
+class DialogNewFile:
     def __init__(self, file_name):
-        self.initialize()
+        self._initialize()
         self.file_name = file_name
 
-    def initialize(self):
+    def _initialize(self):
         self.root = Tk()
-        self.root.geometry("250x190")
-        self.root.title("How to Proceed?")
+        self.root.geometry('250x190')
+        self.root.title('Next Steps')
         self.root.frame = Frame(self.root)
         self.root.frame.pack(fill=BOTH, expand=False)
-        self.create_buttons()
+        self._create_widgets()
 
     def _create_excel_entry(self):
-        self.excel = Excel_Worker(
-                "/Report/Master_Tracker_2023.xlsx",
+        parent_dir = os.path.dirname(__file__)
+        excel_path = os.path.join(parent_dir, '\Trackers\1MASTER 2023 QUOTE TRACKER.xlsx')
+        self.excel = ExcelWorker(
+                excel_path,
                 self.dir_name,
             )
         
-    def create_folder(self):
+    def _create_folder(self):
         parent_dir = os.path.dirname(__file__)
         print(parent_dir)
         # file_path = "".join("/", self.file_name)
         print(self.file_name)
         self.dir_name = os.path.splitext(self.file_name)[0]
-        # dir_name = dir_name.split()
-        self.path = os.path.join(parent_dir, self.dir_name)
+        # dir_name = dir_name.split() #NOT needed FOR NOW as we will title files with client names ... for now
+        self.path = os.path.join(parent_dir, '\QUOTES New', self.dir_name)
         os.makedirs(self.path)
         self._move_quoteform_to_folder()
         self._create_excel_entry()
@@ -76,64 +98,64 @@ class dialog_new_file:
         shutil.move(self.file_name, self.path)
 
     def allocate_markets(self):
-        dialog_allocate = Dialog_Allocate_Markets()
+        dialog_allocate = DialogAllocateMarkets()
 
     def run_quickdraw_app(self):
-        subprocess.run(["QuickDraw.exe"])
+        subprocess.run(['QuickDraw.exe'])
 
     def choice(self, option: str) -> None:
-        if option == "create_folder":
-            self.create_folder()
+        if option == 'only create folder':
+            self._create_folder()
             self.root.destroy()
             
-        elif option == "allocate":
-            self.create_folder()
+        elif option == 'allocate':
+            self._create_folder()
             self.root.destroy()
             self.allocate_markets()
         else:
-            self.create_folder()
+            self._create_folder()
             self.root.destroy()
             self.run_quickdraw_app()
 
-    def create_buttons(self):
+    def _create_widgets(self):
         submit_btn = Button(
             self.root.frame,
-            text="Submit to Markets",
+            text='Submit to Markets',
             width=30,
             height=3,
-            command=lambda: self.choice("submit"),
+            command=lambda: self.choice('submit'),
             default=ACTIVE,
-            bg="green",
+            bg='green',
         )
         submit_btn.pack(side=TOP, fill=NONE, padx=5, pady=5)
 
         allocate_btn = Button(
             self.root.frame,
-            text="Allocate Markets",
+            text='Allocate Markets',
             width=30,
             height=3,
-            command=lambda: self.choice("allocate"),
+            command=lambda: self.choice('allocate'),
             default=ACTIVE,
-            bg="yellow",
+            bg='yellow',
         )
         allocate_btn.pack(side=TOP, fill=NONE, expand=True, padx=5, pady=5)
 
-        pass_btn = Button(
+        create_folder_only_btn = Button(
             self.root.frame,
-            text="Only create folder",
+            text='Only create folder',
             width=30,
             height=3,
-            command=lambda: self.choice("create_folder"),
+            command=lambda: self.choice('only create folder'),
             default=ACTIVE,
-            bg="orange",
+            bg='orange',
         )
-        pass_btn.pack(side=TOP, fill=NONE, expand=True, padx=5, pady=5)
+        create_folder_only_btn.pack(side=TOP, fill=NONE, expand=True, padx=5, pady=5)
 
 
-class Excel_Worker:
+class ExcelWorker:
     def __init__(
         self,
-        workbook_name_or_path,
+        workbook_path_and_name,
         name,
         vessel_year,
         vessel,
@@ -153,6 +175,7 @@ class Excel_Worker:
         status,
         referral,
     ):
+        self.wb_path = workbook_path_and_name
         self.name = name
         self.date = str(datetime.today()).split()[0]
         self.vessel_year = vessel_year
@@ -172,25 +195,25 @@ class Excel_Worker:
         self.tv = tv
         self.status = status
         self.referral = referral
-        self.wb = load_workbook(workbook_name_or_path)
+        self.wb = load_workbook(self.wb_path)
         month = self.get_current_month()
-        self.wb.active = self.wb[month]
+        self.ws = self.wb[month]
         self._create_entry()
 
     def get_current_month(self):
         months_of_the_year = {
-            1: "January",
-            2: "February",
-            3: "March",
-            4: "April",
-            5: "May",
-            6: "June",
-            7: "July",
-            8: "August",
-            9: "September",
-            10: "October",
-            11: "November",
-            12: "December",
+            1: 'January',
+            2: 'February',
+            3: 'March',
+            4: 'April',
+            5: 'May',
+            6: 'June',
+            7: 'July',
+            8: 'August',
+            9: 'September',
+            10: 'October',
+            11: 'November',
+            12: 'December',
         }
         month = datetime.now().month
         return months_of_the_year.get(month).upper()
@@ -221,6 +244,6 @@ class Excel_Worker:
         self._save_workbook()
         
     def _save_workbook(self):
-        self.wb.save("test.xlsx")
+        self.wb.save(self.wb_path)
 
 app = DirWatch()
