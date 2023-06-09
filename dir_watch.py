@@ -26,6 +26,21 @@ class DirWatch:
                 before = dict([(f, None) for f in os.listdir(path_to_watch)])
 
 
+class dialog_allocate_markets:
+    def __init__(self):
+        class dialog_new_file:
+        self.initialize()
+
+    def initialize(self):
+        self.root = Tk()
+        self.root.geometry("250x190")
+        self.root.title("How to Proceed?")
+        self.root.frame = Frame(self.root)
+        self.root.frame.pack(fill=BOTH, expand=False)
+    
+    
+
+
 class dialog_new_file:
     def __init__(self, file_name):
         self.initialize()
@@ -39,6 +54,12 @@ class dialog_new_file:
         self.root.frame.pack(fill=BOTH, expand=False)
         self.create_buttons()
 
+    def _create_excel_entry(self):
+        self.excel = Excel_Worker(
+                "/Report/Master_Tracker_2023.xlsx",
+                self.dir_name,
+            )
+        
     def create_folder(self):
         parent_dir = os.path.dirname(__file__)
         print(parent_dir)
@@ -55,7 +76,7 @@ class dialog_new_file:
         shutil.move(self.file_name, self.path)
 
     def allocate_markets(self):
-        pass
+        dialog_allocate = Dialog_Allocate_Markets()
 
     def run_quickdraw_app(self):
         subprocess.run(["QuickDraw.exe"])
@@ -64,15 +85,11 @@ class dialog_new_file:
         if option == "create_folder":
             self.create_folder()
             self.root.destroy()
-            self.excel = Excel_Worker(
-                "/Report/Master_Tracker_2023.xlsx",
-                self.dir_name,
-            )
-
+            
         elif option == "allocate":
             self.create_folder()
-            self.allocate_markets()
             self.root.destroy()
+            self.allocate_markets()
         else:
             self.create_folder()
             self.root.destroy()
@@ -160,8 +177,6 @@ class Excel_Worker:
         self.wb.active = self.wb[month]
         self._create_entry()
 
-        self.wb.save("test.xlsx")
-
     def get_current_month(self):
         months_of_the_year = {
             1: "January",
@@ -203,6 +218,9 @@ class Excel_Worker:
             self.referral,
         ]
         self.ws.append(list_of_client_data)
-
+        self._save_workbook()
+        
+    def _save_workbook(self):
+        self.wb.save("test.xlsx")
 
 app = DirWatch()
