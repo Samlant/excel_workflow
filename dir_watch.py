@@ -52,7 +52,7 @@ class DialogAllocateMarkets:
     def _initialize(self):
         self.root = Tk()
         self.root.geometry('250x190')
-        self.root.title('How to Proceed?')
+        self.root.title('Assign Markets')
         self.root.frame = Frame(self.root)
         self.root.frame.pack(fill=BOTH, expand=False)
         self._create_widgets()
@@ -76,7 +76,8 @@ class DialogNewFile:
 
     def _create_excel_entry(self):
         parent_dir = os.path.dirname(__file__)
-        excel_path = os.path.join(parent_dir, '\Trackers\1MASTER 2023 QUOTE TRACKER.xlsx')
+        tracker_path = r'\Trackers\1MASTER 2023 QUOTE TRACKER.xlsx'
+        excel_path = os.path.join(parent_dir, tracker_path)
         self.excel = ExcelWorker(
                 excel_path,
                 self.dir_name,
@@ -89,10 +90,10 @@ class DialogNewFile:
         print(self.file_name)
         self.dir_name = os.path.splitext(self.file_name)[0]
         # dir_name = dir_name.split() #NOT needed FOR NOW as we will title files with client names ... for now
-        self.path = os.path.join(parent_dir, '\QUOTES New', self.dir_name)
+        self.path = os.path.join(parent_dir, 'QUOTES New', self.dir_name)
         os.makedirs(self.path)
         self._move_quoteform_to_folder()
-        self._create_excel_entry()
+        #self._create_excel_entry()
 
     def _move_quoteform_to_folder(self):
         shutil.move(self.file_name, self.path)
