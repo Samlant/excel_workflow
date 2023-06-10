@@ -2,11 +2,14 @@ import os
 import time
 import subprocess
 import shutil
+import string
 from tkinter import *
 from datetime import datetime
 from dataclasses import dataclass
 
 from openpyxl import Workbook, load_workbook
+import fillpdf
+from fillpdf import fillpdfs
 
 
 PATH_TO_WATCH = os.getcwd()
@@ -23,10 +26,10 @@ class DirWatch:
         self._begin_watch()
 
     def _begin_watch(self) -> None:
-        before = dict([(f, None) for f in PATH_TO_WATCH])
+        before = dict([(f, None) for f in os.listdir(PATH_TO_WATCH)])
         while 1:
             time.sleep(10)
-            after = dict([(f, None) for f in PATH_TO_WATCH])
+            after = dict([(f, None) for f in os.listdir(PATH_TO_WATCH)])
             added = [f for f in after if not f in before]
             if added:
                 new_file = added[0]
@@ -37,22 +40,86 @@ class DirWatch:
 
 class DialogNewFile:
     def __init__(self, file_name):
-        self._initialize()
-        self.excel_entry = {'vessel_year': '', 'vessel': '', 'markets': [], 'status': 'ALLOCATE AND SUBMIT TO MRKTS', 'referral': ''}
+        self.excel_entry = {
+            "vessel_year": "",
+            "vessel": "",
+            "markets": [],
+            "status": "ALLOCATE AND SUBMIT TO MRKTS",
+            "referral": "",
+        }
         self.file_name = file_name
+        self._initialize()
 
     def _initialize(self):
         self.root = Tk()
-        self.root.geometry("250x190")
+        self.root.geometry("300x405")
         self.root.title("Next Steps")
-        self.root.frame = Frame(self.root)
-        self.root.frame.pack(fill=BOTH, expand=False)
-        self._create_widgets()
+        self.root.text_frame = Frame(self.root)
+        self.root.text_frame.pack(side=TOP, fill=BOTH, expand=False)
+        self.root.btn_frame = Frame(self.root)
+        self.root.btn_frame.pack(fill=BOTH, expand=False)
         self._save_client_name()
+        if os.path.splitext(self.file_name)[1] == ".pdf":
+            self.get_PDF_values()
+        self._create_widgets()
+
+    def _save_client_name(self) -> None:
+        client_name = os.path.splitext(self.file_name)[0].split(" ")
+        self.excel_entry["fname"] = string.capwords(client_name[1])
+        self.excel_entry["lname"] = client_name[0].upper()
+
+    def get_PDF_values(self):
+        keys_dict = {
+            "fname": "fname",
+            "lname": "lname",
+            "year": "vessel_year",
+            "vessel": "vessel_make_model",
+            "referral": "referral",
+        }
+        pdf_dict = fillpdfs.get_form_fields(self.file_name)
+        pdf_dict = {key: pdf_dict[key] for key in pdf_dict.keys() & keys_dict.values()}
+
+        self.excel_entry = {}
+        fname = pdf_dict.get(keys_dict["fname"])
+        self.excel_entry["fname"] = string.capwords(fname)
+        lname = pdf_dict.get(keys_dict["lname"])
+        self.excel_entry["lname"] = lname.upper()
+        vessel = pdf_dict.get(keys_dict["vessel"])
+        self.excel_entry["vessel"] = string.capwords(vessel)
+        self.excel_entry["vessel_year"] = pdf_dict.get(keys_dict["year"])
+        referral = pdf_dict.get(keys_dict["referral"])
+        self.excel_entry["referral"] = referral.upper()
+        # if any(chr.isdigit() for chr in self.excel_entry["vessel"]):
+        #     self.excel_entry["length"] = pdf_dict.get(keys_dict["length"])
 
     def _create_widgets(self):
+        client_name = " ".join([self.excel_entry["fname"], self.excel_entry["lname"]])
+        vessel = self.excel_entry["vessel"]
+        year = self.excel_entry["vessel_year"]
+        referral = self.excel_entry["referral"]
+
+        Label(self.root.text_frame, text="Client name: ").pack(fill=NONE)
+        name_entry = Entry(self.root.text_frame, width=30, justify="center")
+        name_entry.insert(0, client_name)
+        name_entry.pack(side=TOP, fill=NONE, pady=5)
+
+        Label(self.root.text_frame, text="Vessel: ").pack(fill=NONE)
+        vessel_entry = Entry(self.root.text_frame, width=30, justify="center")
+        vessel_entry.insert(0, vessel)
+        vessel_entry.pack(side=TOP, fill=NONE, pady=5)
+
+        Label(self.root.text_frame, text="Vessel year: ").pack(fill=NONE)
+        year_entry = Entry(self.root.text_frame, width=10, justify="center")
+        year_entry.insert(0, year)
+        year_entry.pack(side=TOP, fill=NONE, pady=5)
+
+        Label(self.root.text_frame, text="Referral: ").pack(fill=NONE)
+        referral_entry = Entry(self.root.text_frame, width=30, justify="center")
+        referral_entry.insert(0, referral)
+        referral_entry.pack(side=TOP, fill=NONE, pady=5)
+
         submit_btn = Button(
-            self.root.frame,
+            self.root.btn_frame,
             text="Submit to Markets",
             width=30,
             height=3,
@@ -63,7 +130,7 @@ class DialogNewFile:
         submit_btn.pack(side=TOP, fill=NONE, padx=5, pady=5)
 
         allocate_btn = Button(
-            self.root.frame,
+            self.root.btn_frame,
             text="Allocate Markets",
             width=30,
             height=3,
@@ -74,7 +141,7 @@ class DialogNewFile:
         allocate_btn.pack(side=TOP, fill=NONE, expand=True, padx=5, pady=5)
 
         create_folder_only_btn = Button(
-            self.root.frame,
+            self.root.btn_frame,
             text="Only create folder",
             width=30,
             height=3,
@@ -84,16 +151,11 @@ class DialogNewFile:
         )
         create_folder_only_btn.pack(side=TOP, fill=NONE, expand=True, padx=5, pady=5)
 
-    def _save_client_name(self) -> None:
-        client_name = os.path.splitext(self.file_name)[0].split(" ")
-        self.excel_entry["fname"] = client_name[1]
-        self.excel_entry["lname"] = client_name[0]
-
     def choice(self, option: str) -> None:
         if option == "only create folder":
             self._create_folder()
             self.root.destroy()
-            self.excel_entry['markets'] = []
+            self.excel_entry["markets"] = []
             self._create_excel_entry(self.excel_entry)
 
         elif option == "allocate":
@@ -127,8 +189,6 @@ class DialogNewFile:
         subprocess.run(["QuickDraw.exe"])
 
 
-
-
 class DialogAllocateMarkets:
     def __init__(self):
         self._initialize()
@@ -150,15 +210,15 @@ class ExcelWorker:
         self,
         excel_entry: dict,
     ):
-        fname = excel_entry['fname'].capitalize()
-        lname = excel_entry['lname'].upper()
-        self.name = ' '.join([lname, fname])
+        fname = excel_entry["fname"].capitalize()
+        lname = excel_entry["lname"].upper()
+        self.name = " ".join([lname, fname])
         self.date = str(datetime.today()).split()[0]
-        self.vessel_year = excel_entry['vessel_year']
-        self.vessel = excel_entry['vessel']
-        self.markets = excel_entry['markets']
-        self.status = excel_entry['status']
-        self.referral = excel_entry['referral']
+        self.vessel_year = excel_entry["vessel_year"]
+        self.vessel = excel_entry["vessel"]
+        self.markets = excel_entry["markets"]
+        self.status = excel_entry["status"]
+        self.referral = excel_entry["referral"]
         self.wb = load_workbook(TRACKER_PATH)
         month = self.get_current_month()
         self.ws = self.wb[month]
@@ -185,7 +245,7 @@ class ExcelWorker:
     def _create_entry(self):
         list_of_client_data = [
             self.fname,
-            self
+            self.lname,
             self.date,
             self.vessel_year,
             self.vessel,
