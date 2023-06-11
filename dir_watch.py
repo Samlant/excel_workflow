@@ -28,7 +28,7 @@ class DirWatch:
     def _begin_watch(self) -> None:
         before = dict([(f, None) for f in os.listdir(PATH_TO_WATCH)])
         while 1:
-            time.sleep(10)
+            time.sleep(2)
             after = dict([(f, None) for f in os.listdir(PATH_TO_WATCH)])
             added = [f for f in after if not f in before]
             if added:
@@ -195,14 +195,169 @@ class DialogAllocateMarkets:
 
     def _initialize(self):
         self.root = Tk()
-        self.root.geometry("250x190")
-        self.root.title("Assign Markets")
-        self.root.frame = Frame(self.root)
+        self.root.geometry("260x560")
+        self.root.title("Allocate Markets")
+        self.root.frame = Frame(self.root, bg="#CFEBDF")
         self.root.frame.pack(fill=BOTH, expand=False)
         self._create_widgets()
 
     def _create_widgets(self):
-        pass
+        Label(
+            self.root.frame, text="ALLOCATE MARKETS", justify="center", bg="#CFEBDF"
+        ).pack(fill=X, ipady=6)
+        ch_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="Chubb",
+            justify=CENTER,
+            anchor=W,
+            fg="#CFEBDF",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        ch_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        mk_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="Markel",
+            justify=CENTER,
+            anchor=W,
+            fg="#CFEBDF",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        mk_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        ai_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="American Integrity",
+            justify=CENTER,
+            anchor=W,
+            fg="#CFEBDF",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        ai_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        am_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="American Modern",
+            justify=CENTER,
+            anchor=W,
+            fg="#CFEBDF",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        am_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        pg_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="Progressive",
+            justify=CENTER,
+            anchor=W,
+            fg="#CFEBDF",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        pg_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        sw_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="Seawave",
+            justify=CENTER,
+            anchor=W,
+            fg="#CFEBDF",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        sw_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        km_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="Kemah Marine",
+            justify=CENTER,
+            anchor=W,
+            fg="#CFEBDF",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        km_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        cp_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="Concept Special Risks",
+            justify=CENTER,
+            anchor=W,
+            fg="#CFEBDF",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        cp_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        nh_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="New Hampshire",
+            justify=CENTER,
+            anchor=W,
+            fg="#CFEBDF",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        nh_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        In_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="Intact",
+            justify=CENTER,
+            anchor=W,
+            fg="#CFEBDF",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        In_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        tv_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="Travelers",
+            justify=CENTER,
+            anchor=W,
+            fg="#CFEBDF",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        tv_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+
+        submit_btn = Button(
+            master=self.root.frame,
+            text="ALLOCATE",
+            width=30,
+            height=10,
+            bg="#6290C8",
+            fg="#CFEBDF",
+        )
+        submit_btn.pack(fill=X, expand=False, pady=5, padx=10, ipady=6, ipadx=10)
 
 
 class ExcelWorker:
@@ -244,9 +399,12 @@ class ExcelWorker:
 
     def _create_entry(self):
         list_of_client_data = [
-            self.fname,
-            self.lname,
+            "",
+            "",
+            "",
+            self.name,
             self.date,
+            "",
             self.vessel_year,
             self.vessel,
             self.markets,
@@ -257,11 +415,13 @@ class ExcelWorker:
             self.pg,
             self.sw,
             self.km,
-            self.nh,
             self.cp,
-            self.yi,
+            self.nh,
             self.In,
             self.tv,
+            "",
+            "",
+            "",
             self.status,
             self.referral,
         ]
