@@ -28,7 +28,7 @@ class DirWatch:
     def _begin_watch(self) -> None:
         before = dict([(f, None) for f in os.listdir(PATH_TO_WATCH)])
         while 1:
-            time.sleep(10)
+            time.sleep(2)
             after = dict([(f, None) for f in os.listdir(PATH_TO_WATCH)])
             added = [f for f in after if not f in before]
             if added:
@@ -52,12 +52,12 @@ class DialogNewFile:
 
     def _initialize(self):
         self.root = Tk()
-        self.root.geometry("300x405")
+        self.root.geometry("300x400")
         self.root.title("Next Steps")
-        self.root.text_frame = Frame(self.root)
-        self.root.text_frame.pack(side=TOP, fill=BOTH, expand=False)
-        self.root.btn_frame = Frame(self.root)
-        self.root.btn_frame.pack(fill=BOTH, expand=False)
+        self.root.text_frame = Frame(self.root, bg="#CFEBDF")
+        self.root.text_frame.pack(fill=BOTH, expand=True)
+        self.root.btn_frame = Frame(self.root, bg="#CFEBDF")
+        self.root.btn_frame.pack(fill=BOTH, expand=True, ipady=2)
         self._save_client_name()
         if os.path.splitext(self.file_name)[1] == ".pdf":
             self.get_PDF_values()
@@ -97,59 +97,82 @@ class DialogNewFile:
         vessel = self.excel_entry["vessel"]
         year = self.excel_entry["vessel_year"]
         referral = self.excel_entry["referral"]
+        self.root.text_frame.grid_columnconfigure(0, weight=1)
+        self.root.btn_frame.grid_columnconfigure(0, weight=1)
 
-        Label(self.root.text_frame, text="Client name: ").pack(fill=NONE)
-        name_entry = Entry(self.root.text_frame, width=30, justify="center")
+        Label(self.root.text_frame, text="Client name: ", bg="#CFEBDF").grid(
+            column=0, row=0, pady=(3, 0)
+        )
+        name_entry = Entry(
+            self.root.text_frame, width=30, justify="center", bg="#5F634F", fg="#FFCAB1"
+        )
         name_entry.insert(0, client_name)
-        name_entry.pack(side=TOP, fill=NONE, pady=5)
+        name_entry.grid(column=0, row=1, pady=(0, 8))
 
-        Label(self.root.text_frame, text="Vessel: ").pack(fill=NONE)
-        vessel_entry = Entry(self.root.text_frame, width=30, justify="center")
+        Label(self.root.text_frame, text="Vessel: ", bg="#CFEBDF").grid(column=0, row=2)
+        vessel_entry = Entry(
+            self.root.text_frame, width=30, justify="center", bg="#5F634F", fg="#FFCAB1"
+        )
         vessel_entry.insert(0, vessel)
-        vessel_entry.pack(side=TOP, fill=NONE, pady=5)
+        vessel_entry.grid(column=0, row=3, pady=(0, 8))
 
-        Label(self.root.text_frame, text="Vessel year: ").pack(fill=NONE)
-        year_entry = Entry(self.root.text_frame, width=10, justify="center")
+        Label(self.root.text_frame, text="Vessel year: ", bg="#CFEBDF").grid(
+            column=0, row=4
+        )
+        year_entry = Entry(
+            self.root.text_frame, width=10, justify="center", bg="#5F634F", fg="#FFCAB1"
+        )
         year_entry.insert(0, year)
-        year_entry.pack(side=TOP, fill=NONE, pady=5)
+        year_entry.grid(column=0, row=5, pady=(0, 8))
 
-        Label(self.root.text_frame, text="Referral: ").pack(fill=NONE)
-        referral_entry = Entry(self.root.text_frame, width=30, justify="center")
+        Label(self.root.text_frame, text="Referral: ", bg="#CFEBDF").grid(
+            column=0, row=6
+        )
+        referral_entry = Entry(
+            self.root.text_frame,
+            width=30,
+            justify="center",
+            bg="#5F634F",
+            fg="#FFCAB1",
+        )
         referral_entry.insert(0, referral)
-        referral_entry.pack(side=TOP, fill=NONE, pady=5)
+        referral_entry.grid(column=0, row=7, pady=(0, 7))
 
         submit_btn = Button(
             self.root.btn_frame,
             text="Submit to Markets",
-            width=30,
+            width=36,
             height=3,
             command=lambda: self.choice("submit"),
             default=ACTIVE,
-            bg="green",
+            bg="#1D3461",
+            fg="#CFEBDF",
         )
-        submit_btn.pack(side=TOP, fill=NONE, padx=5, pady=5)
+        submit_btn.grid(row=0, column=0, padx=5, pady=(0, 0))
 
         allocate_btn = Button(
             self.root.btn_frame,
             text="Allocate Markets",
-            width=30,
+            width=36,
             height=3,
             command=lambda: self.choice("allocate"),
             default=ACTIVE,
-            bg="yellow",
+            bg="#1D3461",
+            fg="#CFEBDF",
         )
-        allocate_btn.pack(side=TOP, fill=NONE, expand=True, padx=5, pady=5)
+        allocate_btn.grid(row=1, column=0, padx=5, pady=(3, 3))
 
         create_folder_only_btn = Button(
             self.root.btn_frame,
             text="Only create folder",
-            width=30,
+            width=36,
             height=3,
             command=lambda: self.choice("only create folder"),
             default=ACTIVE,
-            bg="orange",
+            bg="#1D3461",
+            fg="#CFEBDF",
         )
-        create_folder_only_btn.pack(side=TOP, fill=NONE, expand=True, padx=5, pady=5)
+        create_folder_only_btn.grid(row=2, column=0, padx=5, pady=(0, 5))
 
     def choice(self, option: str) -> None:
         if option == "only create folder":
@@ -195,14 +218,173 @@ class DialogAllocateMarkets:
 
     def _initialize(self):
         self.root = Tk()
-        self.root.geometry("250x190")
-        self.root.title("Assign Markets")
-        self.root.frame = Frame(self.root)
+        self.root.geometry("260x560")
+        self.root.title("Allocate Markets")
+        self.root.frame = Frame(self.root, bg="#CFEBDF")
         self.root.frame.pack(fill=BOTH, expand=False)
         self._create_widgets()
 
     def _create_widgets(self):
-        pass
+        Label(
+            self.root.frame,
+            text="ALLOCATE MARKETS",
+            justify="center",
+            bg="#CFEBDF",
+            fg="#5F634F",
+        ).pack(fill=X, ipady=6)
+        ch_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="Chubb",
+            justify=CENTER,
+            anchor=W,
+            fg="#FFCAB1",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        ch_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        mk_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="Markel",
+            justify=CENTER,
+            anchor=W,
+            fg="#FFCAB1",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        mk_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        ai_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="American Integrity",
+            justify=CENTER,
+            anchor=W,
+            fg="#FFCAB1",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        ai_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        am_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="American Modern",
+            justify=CENTER,
+            anchor=W,
+            fg="#FFCAB1",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        am_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        pg_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="Progressive",
+            justify=CENTER,
+            anchor=W,
+            fg="#FFCAB1",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        pg_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        sw_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="Seawave",
+            justify=CENTER,
+            anchor=W,
+            fg="#FFCAB1",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        sw_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        km_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="Kemah Marine",
+            justify=CENTER,
+            anchor=W,
+            fg="#FFCAB1",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        km_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        cp_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="Concept Special Risks",
+            justify=CENTER,
+            anchor=W,
+            fg="#FFCAB1",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        cp_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        nh_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="New Hampshire",
+            justify=CENTER,
+            anchor=W,
+            fg="#FFCAB1",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        nh_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        In_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="Intact",
+            justify=CENTER,
+            anchor=W,
+            fg="#FFCAB1",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        In_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+        tv_checkbtn = Checkbutton(
+            self.root.frame,
+            relief="raised",
+            text="Travelers",
+            justify=CENTER,
+            anchor=W,
+            fg="#FFCAB1",
+            bg="#5F634F",
+            selectcolor="#000000",
+        )
+        tv_checkbtn.pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+
+        allocate_btn = Button(
+            master=self.root.frame,
+            text="ALLOCATE",
+            width=30,
+            height=10,
+            bg="#1D3461",
+            fg="#CFEBDF",
+        )
+        allocate_btn.pack(fill=X, expand=False, pady=5, padx=10, ipady=6, ipadx=10)
 
 
 class ExcelWorker:
@@ -244,9 +426,12 @@ class ExcelWorker:
 
     def _create_entry(self):
         list_of_client_data = [
-            self.fname,
-            self.lname,
+            "",
+            "",
+            "",
+            self.name,
             self.date,
+            "",
             self.vessel_year,
             self.vessel,
             self.markets,
@@ -257,11 +442,13 @@ class ExcelWorker:
             self.pg,
             self.sw,
             self.km,
-            self.nh,
             self.cp,
-            self.yi,
+            self.nh,
             self.In,
             self.tv,
+            "",
+            "",
+            "",
             self.status,
             self.referral,
         ]
