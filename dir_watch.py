@@ -221,7 +221,7 @@ class DialogNewFile:
 
     def run_quickdraw_app(self):
         path = os.path.join(HOME_DIR, "AppData", "Sam_Programs", "QuickDraw.exe")
-        subprocess.run([path], input=self.path)
+        subprocess.run([path], input=self.path, encoding="utf-8")
 
 
 class DialogAllocateMarkets:
