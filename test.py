@@ -1,3 +1,9 @@
-from datetime import datetime
+import subprocess
+import os
 
-print(str(datetime.today()).split()[0])
+path = os.getcwd()
+path = os.path.join(path, "test2.py")
+
+data = path
+
+subprocess.run(["python", path], input=data, encoding="utf-8")
