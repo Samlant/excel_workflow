@@ -201,6 +201,7 @@ class DialogNewFile:
         self.dir_name = os.path.splitext(self.file_name)[0]
         # dir_name = dir_name.split() #NOT needed FOR NOW as we will title files with client names ... for now
         path = os.path.join(QUOTES_FOLDER, self.dir_name)
+        self.path = os.path.join(path, self.file_name)
         os.makedirs(path)
         self._move_quoteform_to_folder(path)
 
@@ -220,7 +221,7 @@ class DialogNewFile:
 
     def run_quickdraw_app(self):
         path = os.path.join(HOME_DIR, "AppData", "Sam_Programs", "QuickDraw.exe")
-        subprocess.run([path])
+        subprocess.run([path], input=self.path)
 
 
 class DialogAllocateMarkets:
