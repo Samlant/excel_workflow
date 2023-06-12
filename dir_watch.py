@@ -5,27 +5,27 @@ import shutil
 import string
 from tkinter import *
 from datetime import datetime
-from dataclasses import dataclass
 
 from openpyxl import Workbook, load_workbook
 import fillpdf
 from fillpdf import fillpdfs
 
 
+
 # # Assuming CURRENT WORKING DIR is USER\APPDATA\LOCAL\SAM_PROGRAM
-# HOME_DIR = os.path.expanduser( '~' )
-# PATH_TO_WATCH = os.path.join(HOME_DIR, 'Novamar FL Office Drive') # Root of FL Office Shared Drive
-# QUOTE_FOLDER = os.path.join(PATH_TO_WATCH, 'QUOTES New')
-# TRACKER_PATH = os.path.join(PATH_TO_WATCH, 'Trackers')
+HOME_DIR = os.path.expanduser( '~' )
+PATH_TO_WATCH = os.path.join(HOME_DIR, 'Novamar Insurance', 'Flordia Office Master - Documents') # Root of FL Office Shared Drive
+QUOTE_FOLDER = os.path.join(PATH_TO_WATCH, 'QUOTES New')
+TRACKER_PATH = os.path.join(PATH_TO_WATCH, 'Trackers', '1MASTER 2023 QUOTE TRACKER.xlsx')
 
-
-PATH_TO_WATCH = os.getcwd()
-QUOTES_FOLDER = os.path.join(PATH_TO_WATCH, "QUOTES New")
-TRACKER_PATH = os.path.join(
-    PATH_TO_WATCH,
-    "Trackers",
-    "1MASTER 2023 QUOTE TRACKER.xlsx",
-)
+# Below is for testing-purposes only when the above shared drive is unavailable.
+# PATH_TO_WATCH = os.getcwd()
+# QUOTES_FOLDER = os.path.join(PATH_TO_WATCH, "QUOTES New")
+# TRACKER_PATH = os.path.join(
+#     PATH_TO_WATCH,
+#     "Trackers",
+#     "1MASTER 2023 QUOTE TRACKER.xlsx",
+# )
 
 
 class DirWatch:
@@ -236,6 +236,20 @@ class DialogAllocateMarkets:
         self.root.frame.pack(fill=BOTH, expand=False)
         self._create_widgets()
 
+    def _create_button(self, text: str, text_variable: IntVar):
+        Button(self.root.frame,
+               text=text,
+               text_variable=text_variable,
+               relief="raised",
+               justify=CENTER,
+               anchor=W,
+               fg="#FFCAB1",
+               bg="#5F634F",
+               selectcolor="#000000",
+            ).pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        )
+
     def _create_widgets(self):
         Label(
             self.root.frame,
@@ -244,149 +258,171 @@ class DialogAllocateMarkets:
             bg="#CFEBDF",
             fg="#5F634F",
         ).pack(fill=X, ipady=6)
-        self.ch_checkbtn = Checkbutton(
-            self.root.frame,
-            relief="raised",
-            text="Chubb",
-            justify=CENTER,
-            anchor=W,
-            fg="#FFCAB1",
-            bg="#5F634F",
-            selectcolor="#000000",
-        )
-        self.ch_checkbtn.pack(
-            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        )
-        self.mk_checkbtn = Checkbutton(
-            self.root.frame,
-            relief="raised",
-            text="Markel",
-            justify=CENTER,
-            anchor=W,
-            fg="#FFCAB1",
-            bg="#5F634F",
-            selectcolor="#000000",
-        )
-        self.mk_checkbtn.pack(
-            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        )
-        self.ai_checkbtn = Checkbutton(
-            self.root.frame,
-            relief="raised",
-            text="American Integrity",
-            justify=CENTER,
-            anchor=W,
-            fg="#FFCAB1",
-            bg="#5F634F",
-            selectcolor="#000000",
-        )
-        self.ai_checkbtn.pack(
-            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        )
-        self.am_checkbtn = Checkbutton(
-            self.root.frame,
-            relief="raised",
-            text="American Modern",
-            justify=CENTER,
-            anchor=W,
-            fg="#FFCAB1",
-            bg="#5F634F",
-            selectcolor="#000000",
-        )
-        self.am_checkbtn.pack(
-            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        )
-        self.pg_checkbtn = Checkbutton(
-            self.root.frame,
-            relief="raised",
-            text="Progressive",
-            justify=CENTER,
-            anchor=W,
-            fg="#FFCAB1",
-            bg="#5F634F",
-            selectcolor="#000000",
-        )
-        self.pg_checkbtn.pack(
-            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        )
-        self.sw_checkbtn = Checkbutton(
-            self.root.frame,
-            relief="raised",
-            text="Seawave",
-            justify=CENTER,
-            anchor=W,
-            fg="#FFCAB1",
-            bg="#5F634F",
-            selectcolor="#000000",
-        )
-        self.sw_checkbtn.pack(
-            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        )
-        self.km_checkbtn = Checkbutton(
-            self.root.frame,
-            relief="raised",
-            text="Kemah Marine",
-            justify=CENTER,
-            anchor=W,
-            fg="#FFCAB1",
-            bg="#5F634F",
-            selectcolor="#000000",
-        )
-        self.km_checkbtn.pack(
-            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        )
-        self.cp_checkbtn = Checkbutton(
-            self.root.frame,
-            relief="raised",
-            text="Concept Special Risks",
-            justify=CENTER,
-            anchor=W,
-            fg="#FFCAB1",
-            bg="#5F634F",
-            selectcolor="#000000",
-        )
-        self.cp_checkbtn.pack(
-            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        )
-        self.nh_checkbtn = Checkbutton(
-            self.root.frame,
-            relief="raised",
-            text="New Hampshire",
-            justify=CENTER,
-            anchor=W,
-            fg="#FFCAB1",
-            bg="#5F634F",
-            selectcolor="#000000",
-        )
-        self.nh_checkbtn.pack(
-            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        )
-        self.In_checkbtn = Checkbutton(
-            self.root.frame,
-            relief="raised",
-            text="Intact",
-            justify=CENTER,
-            anchor=W,
-            fg="#FFCAB1",
-            bg="#5F634F",
-            selectcolor="#000000",
-        )
-        self.In_checkbtn.pack(
-            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        )
-        self.tv_checkbtn = Checkbutton(
-            self.root.frame,
-            relief="raised",
-            text="Travelers",
-            justify=CENTER,
-            anchor=W,
-            fg="#FFCAB1",
-            bg="#5F634F",
-            selectcolor="#000000",
-        )
-        self.tv_checkbtn.pack(
-            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        )
+        self.ch_checkbtn = IntVar(self.root.frame)
+        self._create_button('Chubb', self.ch_checkbtn)
+        # self.ch_checkbtn = Checkbutton(
+        #     self.root.frame,
+        #     relief="raised",
+        #     text="Chubb",
+        #     justify=CENTER,
+        #     anchor=W,
+        #     fg="#FFCAB1",
+        #     bg="#5F634F",
+        #     selectcolor="#000000",
+        # )
+        # self.ch_checkbtn.pack(
+        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        # )
+        self.mk_checkbtn = IntVar(self.root.frame)
+        self._create_button('Markel', self.mk_checkbtn)
+        # self.mk_checkbtn = Checkbutton(
+        #     self.root.frame,
+        #     relief="raised",
+        #     text="Markel",
+        #     justify=CENTER,
+        #     anchor=W,
+        #     fg="#FFCAB1",
+        #     bg="#5F634F",
+        #     selectcolor="#000000",
+        # )
+        # self.mk_checkbtn.pack(
+        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        # )
+        self.ai_checkbtn = IntVar(self.root.frame)
+        self._create_button('Markel', self.ai_checkbtn)
+        # self.ai_checkbtn = Checkbutton(
+        #     self.root.frame,
+        #     relief="raised",
+        #     text="American Integrity",
+        #     justify=CENTER,
+        #     anchor=W,
+        #     fg="#FFCAB1",
+        #     bg="#5F634F",
+        #     selectcolor="#000000",
+        # )
+        # self.ai_checkbtn.pack(
+        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        # )
+        self.am_checkbtn = IntVar(self.root.frame)
+        self._create_button('Markel', self.am_checkbtn)
+        # self.am_checkbtn = Checkbutton(
+        #     self.root.frame,
+        #     relief="raised",
+        #     text="American Modern",
+        #     justify=CENTER,
+        #     anchor=W,
+        #     fg="#FFCAB1",
+        #     bg="#5F634F",
+        #     selectcolor="#000000",
+        # )
+        # self.am_checkbtn.pack(
+        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        # )
+        self.pg_checkbtn = IntVar(self.root.frame)
+        self._create_button('Markel', self.pg_checkbtn)
+        # self.pg_checkbtn = Checkbutton(
+        #     self.root.frame,
+        #     relief="raised",
+        #     text="Progressive",
+        #     justify=CENTER,
+        #     anchor=W,
+        #     fg="#FFCAB1",
+        #     bg="#5F634F",
+        #     selectcolor="#000000",
+        # )
+        # self.pg_checkbtn.pack(
+        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        # )
+        self.sw_checkbtn = IntVar(self.root.frame)
+        self._create_button('Markel', self.sw_checkbtn)
+        # self.sw_checkbtn = Checkbutton(
+        #     self.root.frame,
+        #     relief="raised",
+        #     text="Seawave",
+        #     justify=CENTER,
+        #     anchor=W,
+        #     fg="#FFCAB1",
+        #     bg="#5F634F",
+        #     selectcolor="#000000",
+        # )
+        # self.sw_checkbtn.pack(
+        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        # )
+        self.km_checkbtn = IntVar(self.root.frame)
+        self._create_button('Markel', self.km_checkbtn)
+        # self.km_checkbtn = Checkbutton(
+        #     self.root.frame,
+        #     relief="raised",
+        #     text="Kemah Marine",
+        #     justify=CENTER,
+        #     anchor=W,
+        #     fg="#FFCAB1",
+        #     bg="#5F634F",
+        #     selectcolor="#000000",
+        # )
+        # self.km_checkbtn.pack(
+        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        # )
+        self.cp_checkbtn = IntVar(self.root.frame)
+        self._create_button('Markel', self.cp_checkbtn)
+        # self.cp_checkbtn = Checkbutton(
+        #     self.root.frame,
+        #     relief="raised",
+        #     text="Concept Special Risks",
+        #     justify=CENTER,
+        #     anchor=W,
+        #     fg="#FFCAB1",
+        #     bg="#5F634F",
+        #     selectcolor="#000000",
+        # )
+        # self.cp_checkbtn.pack(
+        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        # )
+        self.nh_checkbtn = IntVar(self.root.frame)
+        self._create_button('Markel', self.nh_checkbtn)
+        # self.nh_checkbtn = Checkbutton(
+        #     self.root.frame,
+        #     relief="raised",
+        #     text="New Hampshire",
+        #     justify=CENTER,
+        #     anchor=W,
+        #     fg="#FFCAB1",
+        #     bg="#5F634F",
+        #     selectcolor="#000000",
+        # )
+        # self.nh_checkbtn.pack(
+        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        # )
+        self.In_checkbtn = IntVar(self.root.frame)
+        self._create_button('Markel', self.In_checkbtn)
+        # self.In_checkbtn = Checkbutton(
+        #     self.root.frame,
+        #     relief="raised",
+        #     text="Intact",
+        #     justify=CENTER,
+        #     anchor=W,
+        #     fg="#FFCAB1",
+        #     bg="#5F634F",
+        #     selectcolor="#000000",
+        # )
+        # self.In_checkbtn.pack(
+        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        # )
+        self.tv_checkbtn = IntVar(self.root.frame)
+        self._create_button('Markel', self.tv_checkbtn)
+        # self.tv_checkbtn = Checkbutton(
+        #     self.root.frame,
+        #     relief="raised",
+        #     text="Travelers",
+        #     justify=CENTER,
+        #     anchor=W,
+        #     fg="#FFCAB1",
+        #     bg="#5F634F",
+        #     selectcolor="#000000",
+        # )
+        # self.tv_checkbtn.pack(
+        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        # )
 
         allocate_btn = Button(
             master=self.root.frame,
@@ -395,6 +431,7 @@ class DialogAllocateMarkets:
             height=10,
             bg="#1D3461",
             fg="#CFEBDF",
+            command=lambda: self._return_markets(),
         )
         allocate_btn.pack(
             fill=X,
@@ -403,7 +440,6 @@ class DialogAllocateMarkets:
             padx=10,
             ipady=6,
             ipadx=10,
-            command=lambda: self._return_markets(),
         )
 
     def _return_markets(self):
@@ -492,7 +528,7 @@ class ExcelWorker:
         )
         return list_of_client_data
 
-    def create_row(self, row_data: list):
+    def create_row(self, row_data: list) -> bool:
         if self.ws.append(row_data):
             if self._save_workbook():
                 return True
