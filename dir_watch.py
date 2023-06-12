@@ -12,6 +12,13 @@ import fillpdf
 from fillpdf import fillpdfs
 
 
+# # Assuming CURRENT WORKING DIR is USER\APPDATA\LOCAL\SAM_PROGRAM
+# HOME_DIR = os.path.expanduser( '~' )
+# PATH_TO_WATCH = os.path.join(HOME_DIR, 'Novamar FL Office Drive') # Root of FL Office Shared Drive
+# QUOTE_FOLDER = os.path.join(PATH_TO_WATCH, 'QUOTES New')
+# TRACKER_PATH = os.path.join(PATH_TO_WATCH, 'Trackers')
+
+
 PATH_TO_WATCH = os.getcwd()
 QUOTES_FOLDER = os.path.join(PATH_TO_WATCH, "QUOTES New")
 TRACKER_PATH = os.path.join(
@@ -43,7 +50,7 @@ class DialogNewFile:
         self.excel_entry = {
             "vessel_year": "",
             "vessel": "",
-            "markets": [],
+            "markets": {},
             "status": "ALLOCATE AND SUBMIT TO MRKTS",
             "referral": "",
         }
@@ -178,15 +185,13 @@ class DialogNewFile:
         if option == "only create folder":
             self._create_folder()
             self.root.destroy()
-            self.excel_entry["markets"] = []
-            self._create_excel_entry(self.excel_entry)
+            self._create_excel_entry()
 
         elif option == "allocate":
             self._create_folder()
             self.root.destroy()
-            markets = []
-            markets = self.allocate_markets()
-            self._create_excel_entry(markets)
+            self.allocate_markets()
+
         else:
             self._create_folder()
             self.root.destroy()
@@ -202,14 +207,20 @@ class DialogNewFile:
     def _move_quoteform_to_folder(self, path: str):
         shutil.move(self.file_name, path)
 
-    def _create_excel_entry(self, markets=[]):
-        pass
+    def _create_excel_entry(self):
+        excel = ExcelWorker(self.excel_entry)
+        row_data = excel.create_entry_list()
+        excel.create_row(row_data=row_data)
+        excel.save_workbook()
 
-    def allocate_markets(self):
+    def allocate_markets(self) -> dict:
         dialog_allocate = DialogAllocateMarkets()
+        self.excel_entry["markets"] = dialog_allocate._return_markets()
+        self._create_excel_entry()
 
     def run_quickdraw_app(self):
-        subprocess.run(["QuickDraw.exe"])
+        path = os.path.join(HOME_DIR, "AppData", "Sam_Programs", "QuickDraw.exe")
+        subprocess.run([path])
 
 
 class DialogAllocateMarkets:
@@ -232,7 +243,7 @@ class DialogAllocateMarkets:
             bg="#CFEBDF",
             fg="#5F634F",
         ).pack(fill=X, ipady=6)
-        ch_checkbtn = Checkbutton(
+        self.ch_checkbtn = Checkbutton(
             self.root.frame,
             relief="raised",
             text="Chubb",
@@ -242,10 +253,10 @@ class DialogAllocateMarkets:
             bg="#5F634F",
             selectcolor="#000000",
         )
-        ch_checkbtn.pack(
+        self.ch_checkbtn.pack(
             fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
         )
-        mk_checkbtn = Checkbutton(
+        self.mk_checkbtn = Checkbutton(
             self.root.frame,
             relief="raised",
             text="Markel",
@@ -255,10 +266,10 @@ class DialogAllocateMarkets:
             bg="#5F634F",
             selectcolor="#000000",
         )
-        mk_checkbtn.pack(
+        self.mk_checkbtn.pack(
             fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
         )
-        ai_checkbtn = Checkbutton(
+        self.ai_checkbtn = Checkbutton(
             self.root.frame,
             relief="raised",
             text="American Integrity",
@@ -268,10 +279,10 @@ class DialogAllocateMarkets:
             bg="#5F634F",
             selectcolor="#000000",
         )
-        ai_checkbtn.pack(
+        self.ai_checkbtn.pack(
             fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
         )
-        am_checkbtn = Checkbutton(
+        self.am_checkbtn = Checkbutton(
             self.root.frame,
             relief="raised",
             text="American Modern",
@@ -281,10 +292,10 @@ class DialogAllocateMarkets:
             bg="#5F634F",
             selectcolor="#000000",
         )
-        am_checkbtn.pack(
+        self.am_checkbtn.pack(
             fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
         )
-        pg_checkbtn = Checkbutton(
+        self.pg_checkbtn = Checkbutton(
             self.root.frame,
             relief="raised",
             text="Progressive",
@@ -294,10 +305,10 @@ class DialogAllocateMarkets:
             bg="#5F634F",
             selectcolor="#000000",
         )
-        pg_checkbtn.pack(
+        self.pg_checkbtn.pack(
             fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
         )
-        sw_checkbtn = Checkbutton(
+        self.sw_checkbtn = Checkbutton(
             self.root.frame,
             relief="raised",
             text="Seawave",
@@ -307,10 +318,10 @@ class DialogAllocateMarkets:
             bg="#5F634F",
             selectcolor="#000000",
         )
-        sw_checkbtn.pack(
+        self.sw_checkbtn.pack(
             fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
         )
-        km_checkbtn = Checkbutton(
+        self.km_checkbtn = Checkbutton(
             self.root.frame,
             relief="raised",
             text="Kemah Marine",
@@ -320,10 +331,10 @@ class DialogAllocateMarkets:
             bg="#5F634F",
             selectcolor="#000000",
         )
-        km_checkbtn.pack(
+        self.km_checkbtn.pack(
             fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
         )
-        cp_checkbtn = Checkbutton(
+        self.cp_checkbtn = Checkbutton(
             self.root.frame,
             relief="raised",
             text="Concept Special Risks",
@@ -333,10 +344,10 @@ class DialogAllocateMarkets:
             bg="#5F634F",
             selectcolor="#000000",
         )
-        cp_checkbtn.pack(
+        self.cp_checkbtn.pack(
             fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
         )
-        nh_checkbtn = Checkbutton(
+        self.nh_checkbtn = Checkbutton(
             self.root.frame,
             relief="raised",
             text="New Hampshire",
@@ -346,10 +357,10 @@ class DialogAllocateMarkets:
             bg="#5F634F",
             selectcolor="#000000",
         )
-        nh_checkbtn.pack(
+        self.nh_checkbtn.pack(
             fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
         )
-        In_checkbtn = Checkbutton(
+        self.In_checkbtn = Checkbutton(
             self.root.frame,
             relief="raised",
             text="Intact",
@@ -359,10 +370,10 @@ class DialogAllocateMarkets:
             bg="#5F634F",
             selectcolor="#000000",
         )
-        In_checkbtn.pack(
+        self.In_checkbtn.pack(
             fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
         )
-        tv_checkbtn = Checkbutton(
+        self.tv_checkbtn = Checkbutton(
             self.root.frame,
             relief="raised",
             text="Travelers",
@@ -372,7 +383,7 @@ class DialogAllocateMarkets:
             bg="#5F634F",
             selectcolor="#000000",
         )
-        tv_checkbtn.pack(
+        self.tv_checkbtn.pack(
             fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
         )
 
@@ -384,7 +395,31 @@ class DialogAllocateMarkets:
             bg="#1D3461",
             fg="#CFEBDF",
         )
-        allocate_btn.pack(fill=X, expand=False, pady=5, padx=10, ipady=6, ipadx=10)
+        allocate_btn.pack(
+            fill=X,
+            expand=False,
+            pady=5,
+            padx=10,
+            ipady=6,
+            ipadx=10,
+            command=lambda: self._return_markets(),
+        )
+
+    def _return_markets(self):
+        dict_of_markets = {
+            "ch": self.ch_checkbtn.get(),
+            "mk": self.mk_checkbtn.get(),
+            "ai": self.ai_checkbtn.get(),
+            "am": self.am_checkbtn.get(),
+            "pg": self.pg_checkbtn.get(),
+            "sw": self.sw_checkbtn.get(),
+            "km": self.km_checkbtn.get(),
+            "cp": self.cp_checkbtn.get(),
+            "nh": self.nh_checkbtn.get(),
+            "In": self.In_checkbtn.get(),
+            "tv": self.tv_checkbtn.get(),
+        }
+        return dict_of_markets
 
 
 class ExcelWorker:
@@ -404,7 +439,7 @@ class ExcelWorker:
         self.wb = load_workbook(TRACKER_PATH)
         month = self.get_current_month()
         self.ws = self.wb[month]
-        self._create_entry()
+        self.markets = self._assign_markets()
 
     def get_current_month(self):
         months_of_the_year = {
@@ -424,38 +459,48 @@ class ExcelWorker:
         month = datetime.now().month
         return months_of_the_year.get(month).upper()
 
-    def _create_entry(self):
-        list_of_client_data = [
-            "",
-            "",
-            "",
-            self.name,
-            self.date,
-            "",
-            self.vessel_year,
-            self.vessel,
-            self.markets,
-            self.ch,
-            self.mk,
-            self.ai,
-            self.am,
-            self.pg,
-            self.sw,
-            self.km,
-            self.cp,
-            self.nh,
-            self.In,
-            self.tv,
-            "",
-            "",
-            "",
-            self.status,
-            self.referral,
-        ]
-        self.ws.append(list_of_client_data)
-        self._save_workbook()
+    def _assign_markets(self) -> list:
+        list_of_markets = []
+        for key, value in self.markets:
+            if value == 1:
+                list_of_markets.append(value)
+            else:
+                list_of_markets.append("")
+        return list_of_markets
 
-    def _save_workbook(self):
+    def create_entry_list(self) -> list:
+        list_of_client_data = (
+            [
+                "",
+                "",
+                "",
+                self.name,
+                self.date,
+                "",
+                self.vessel_year,
+                self.vessel,
+            ]
+            + self.markets
+            + [
+                "",
+                "",
+                "",
+                self.status,
+                self.referral,
+            ]
+        )
+        return list_of_client_data
+
+    def create_row(self, row_data: list):
+        if self.ws.append(row_data):
+            if self._save_workbook():
+                return True
+            else:
+                return False
+        else:
+            return False
+
+    def save_workbook(self):
         self.wb.save(self.wb_path)
 
 
