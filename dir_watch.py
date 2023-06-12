@@ -15,7 +15,7 @@ from fillpdf import fillpdfs
 # # Assuming CURRENT WORKING DIR is USER\APPDATA\LOCAL\SAM_PROGRAM
 HOME_DIR = os.path.expanduser( '~' )
 PATH_TO_WATCH = os.path.join(HOME_DIR, 'Novamar Insurance', 'Flordia Office Master - Documents') # Root of FL Office Shared Drive
-QUOTE_FOLDER = os.path.join(PATH_TO_WATCH, 'QUOTES New')
+QUOTES_FOLDER = os.path.join(PATH_TO_WATCH, 'QUOTES New')
 TRACKER_PATH = os.path.join(PATH_TO_WATCH, 'Trackers', '1MASTER 2023 QUOTE TRACKER.xlsx')
 
 # Below is for testing-purposes only when the above shared drive is unavailable.
@@ -42,7 +42,7 @@ class DirWatch:
                 new_file = added[0]
                 dialog = DialogNewFile(new_file)
                 dialog.root.mainloop()
-                before = dict([(f, None) for f in os.listdir(PATH_TO_WATCH)])
+            before = dict([(f, None) for f in os.listdir(PATH_TO_WATCH)])
 
 
 class DialogNewFile:
@@ -72,8 +72,9 @@ class DialogNewFile:
 
     def _save_client_name(self) -> None:
         client_name = os.path.splitext(self.file_name)[0].split(" ")
-        self.excel_entry["fname"] = string.capwords(client_name[1])
-        self.excel_entry["lname"] = client_name[0].upper()
+        if len(client_name) >= 2:
+            self.excel_entry["fname"] = string.capwords(client_name[1])
+            self.excel_entry["lname"] = client_name[0].upper()
 
     def get_PDF_values(self):
         keys_dict = {
@@ -83,7 +84,8 @@ class DialogNewFile:
             "vessel": "vessel_make_model",
             "referral": "referral",
         }
-        pdf_dict = fillpdfs.get_form_fields(self.file_name)
+        file_path_name = os.path.join(PATH_TO_WATCH, self.file_name)
+        pdf_dict = fillpdfs.get_form_fields(file_path_name)
         pdf_dict = {key: pdf_dict[key] for key in pdf_dict.keys() & keys_dict.values()}
 
         self.excel_entry = {}
@@ -235,20 +237,6 @@ class DialogAllocateMarkets:
         self.root.frame = Frame(self.root, bg="#CFEBDF")
         self.root.frame.pack(fill=BOTH, expand=False)
         self._create_widgets()
-
-    def _create_button(self, text: str, text_variable: IntVar):
-        Button(self.root.frame,
-               text=text,
-               text_variable=text_variable,
-               relief="raised",
-               justify=CENTER,
-               anchor=W,
-               fg="#FFCAB1",
-               bg="#5F634F",
-               selectcolor="#000000",
-            ).pack(
-            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        )
 
     def _create_widgets(self):
         Label(
@@ -440,6 +428,20 @@ class DialogAllocateMarkets:
             padx=10,
             ipady=6,
             ipadx=10,
+        )
+
+    def _create_button(self, text: str, text_variable: IntVar):
+        Button(self.root.frame,
+               text=text,
+               text_variable=text_variable,
+               relief="raised",
+               justify=CENTER,
+               anchor=W,
+               fg="#FFCAB1",
+               bg="#5F634F",
+               selectcolor="#000000",
+            ).pack(
+            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
         )
 
     def _return_markets(self):
