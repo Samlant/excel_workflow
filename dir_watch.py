@@ -98,6 +98,7 @@ class DialogNewFile:
         self.excel_entry["vessel_year"] = pdf_dict.get(keys_dict["year"])
         referral = pdf_dict.get(keys_dict["referral"])
         self.excel_entry["referral"] = referral.upper()
+        self.excel_entry["status"] = 'ALLOCATE AND SUBMIT TO MRKTS'
         # if any(chr.isdigit() for chr in self.excel_entry["vessel"]):
         #     self.excel_entry["length"] = pdf_dict.get(keys_dict["length"])
 
@@ -200,15 +201,19 @@ class DialogNewFile:
             self.run_quickdraw_app()
 
     def _create_folder(self):
-        self.dir_name = os.path.splitext(self.file_name)[0]
+        file_name = os.path.splitext(self.file_name)
+        if file_name[1] == '.pdf':
+            self.dir_name = self.excel_entry["lname"] + ' ' + self.excel_entry["fname"]
+        else:
+            self.dir_name = file_name[0]
         # dir_name = dir_name.split() #NOT needed FOR NOW as we will title files with client names ... for now
         path = os.path.join(QUOTES_FOLDER, self.dir_name)
-        self.path = os.path.join(path, self.file_name)
+        self.path = os.path.join(PATH_TO_WATCH, self.file_name)
         os.makedirs(path)
         self._move_quoteform_to_folder(path)
 
     def _move_quoteform_to_folder(self, path: str):
-        shutil.move(self.file_name, path)
+        shutil.move(self.path, path)
 
     def _create_excel_entry(self):
         excel = ExcelWorker(self.excel_entry)
@@ -218,10 +223,9 @@ class DialogNewFile:
 
     def allocate_markets(self) -> dict:
         dialog_allocate = DialogAllocateMarkets()
-        self.excel_entry["markets"] = dialog_allocate._return_markets()
-        self._create_excel_entry()
 
     def run_quickdraw_app(self):
+        self.excel_entry['status'] = 'Pending with Underwriting'
         path = os.path.join(HOME_DIR, "AppData", "Sam_Programs", "QuickDraw.exe")
         subprocess.run([path], input=self.path, encoding="utf-8")
 
@@ -419,7 +423,7 @@ class DialogAllocateMarkets:
             height=10,
             bg="#1D3461",
             fg="#CFEBDF",
-            command=lambda: self._return_markets(),
+            command=lambda: self._process_market_choices(),
         )
         allocate_btn.pack(
             fill=X,
@@ -430,19 +434,25 @@ class DialogAllocateMarkets:
             ipadx=10,
         )
 
-    def _create_button(self, text: str, text_variable: IntVar):
-        Button(self.root.frame,
+    def _create_button(self, text: str, int_variable: IntVar):
+        x = Checkbutton(self.root.frame,
                text=text,
-               text_variable=text_variable,
+               variable=int_variable,
                relief="raised",
                justify=CENTER,
                anchor=W,
                fg="#FFCAB1",
                bg="#5F634F",
                selectcolor="#000000",
-            ).pack(
+            )
+        x.pack(
             fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
         )
+
+    def _process_market_choices(self):
+        self.excel_entry['markets'] = self._return_markets()
+        self.excel_entry['status'] = 'SUBMIT TO MRKTS'
+        self._create_excel_entry()
 
     def _return_markets(self):
         dict_of_markets = {
@@ -459,6 +469,12 @@ class DialogAllocateMarkets:
             "tv": self.tv_checkbtn.get(),
         }
         return dict_of_markets
+
+    def _create_excel_entry(self):
+        excel = ExcelWorker(self.excel_entry)
+        row_data = excel.create_entry_list()
+        excel.create_row(row_data=row_data)
+        excel.save_workbook()
 
 
 class ExcelWorker:
