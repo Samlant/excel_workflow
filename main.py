@@ -17,6 +17,7 @@ HOME_DIR = os.path.expanduser( '~' )
 PATH_TO_WATCH = os.path.join(HOME_DIR, 'Novamar Insurance', 'Flordia Office Master - Documents') # Root of FL Office Shared Drive
 QUOTES_FOLDER = os.path.join(PATH_TO_WATCH, 'QUOTES New')
 TRACKER_PATH = os.path.join(PATH_TO_WATCH, 'Trackers', '1MASTER 2023 QUOTE TRACKER.xlsx')
+ICON = os.path.join('resources', 'icon.ico')
 
 # Below is for testing-purposes only when the above shared drive is unavailable.
 # PATH_TO_WATCH = os.getcwd()
@@ -40,8 +41,9 @@ class DirWatch:
             added = [f for f in after if not f in before]
             if added:
                 new_file = added[0]
-                dialog = DialogNewFile(new_file)
-                dialog.root.mainloop()
+                if os.path.splitext(new_file)[1] == ('.pdf' or '.docx'):
+                    dialog = DialogNewFile(new_file)
+                    dialog.root.mainloop()
             before = dict([(f, None) for f in os.listdir(PATH_TO_WATCH)])
 
 
@@ -61,6 +63,7 @@ class DialogNewFile:
         self.root = Tk()
         self.root.geometry("300x400")
         self.root.title("Next Steps")
+        self.root.iconbitmap(ICON)
         self.root.text_frame = Frame(self.root, bg="#CFEBDF")
         self.root.text_frame.pack(fill=BOTH, expand=True)
         self.root.btn_frame = Frame(self.root, bg="#CFEBDF")
@@ -201,11 +204,11 @@ class DialogNewFile:
             self.run_quickdraw_app()
 
     def _create_folder(self):
-        file_name = os.path.splitext(self.file_name)
-        if file_name[1] == '.pdf':
+        file_name_list = os.path.splitext(self.file_name)
+        if file_name_list[1] == '.pdf':
             self.dir_name = self.excel_entry["lname"] + ' ' + self.excel_entry["fname"]
         else:
-            self.dir_name = file_name[0]
+            self.dir_name = file_name_list[0]
         # dir_name = dir_name.split() #NOT needed FOR NOW as we will title files with client names ... for now
         path = os.path.join(QUOTES_FOLDER, self.dir_name)
         self.path = os.path.join(PATH_TO_WATCH, self.file_name)
@@ -222,7 +225,7 @@ class DialogNewFile:
         excel.save_workbook()
 
     def allocate_markets(self) -> dict:
-        dialog_allocate = DialogAllocateMarkets()
+        dialog_allocate = DialogAllocateMarkets(self.excel_entry)
 
     def run_quickdraw_app(self):
         self.excel_entry['status'] = 'Pending with Underwriting'
@@ -231,13 +234,15 @@ class DialogNewFile:
 
 
 class DialogAllocateMarkets:
-    def __init__(self):
+    def __init__(self, excel_entry: dict):
+        self.excel_entry = excel_entry
         self._initialize()
 
     def _initialize(self):
         self.root = Tk()
         self.root.geometry("260x560")
         self.root.title("Allocate Markets")
+        self.root.iconbitmap(ICON)
         self.root.frame = Frame(self.root, bg="#CFEBDF")
         self.root.frame.pack(fill=BOTH, expand=False)
         self._create_widgets()
@@ -252,169 +257,36 @@ class DialogAllocateMarkets:
         ).pack(fill=X, ipady=6)
         self.ch_checkbtn = IntVar(self.root.frame)
         self._create_button('Chubb', self.ch_checkbtn)
-        # self.ch_checkbtn = Checkbutton(
-        #     self.root.frame,
-        #     relief="raised",
-        #     text="Chubb",
-        #     justify=CENTER,
-        #     anchor=W,
-        #     fg="#FFCAB1",
-        #     bg="#5F634F",
-        #     selectcolor="#000000",
-        # )
-        # self.ch_checkbtn.pack(
-        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        # )
+
         self.mk_checkbtn = IntVar(self.root.frame)
         self._create_button('Markel', self.mk_checkbtn)
-        # self.mk_checkbtn = Checkbutton(
-        #     self.root.frame,
-        #     relief="raised",
-        #     text="Markel",
-        #     justify=CENTER,
-        #     anchor=W,
-        #     fg="#FFCAB1",
-        #     bg="#5F634F",
-        #     selectcolor="#000000",
-        # )
-        # self.mk_checkbtn.pack(
-        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        # )
+
         self.ai_checkbtn = IntVar(self.root.frame)
-        self._create_button('Markel', self.ai_checkbtn)
-        # self.ai_checkbtn = Checkbutton(
-        #     self.root.frame,
-        #     relief="raised",
-        #     text="American Integrity",
-        #     justify=CENTER,
-        #     anchor=W,
-        #     fg="#FFCAB1",
-        #     bg="#5F634F",
-        #     selectcolor="#000000",
-        # )
-        # self.ai_checkbtn.pack(
-        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        # )
+        self._create_button('American Integrity', self.ai_checkbtn)
+
         self.am_checkbtn = IntVar(self.root.frame)
-        self._create_button('Markel', self.am_checkbtn)
-        # self.am_checkbtn = Checkbutton(
-        #     self.root.frame,
-        #     relief="raised",
-        #     text="American Modern",
-        #     justify=CENTER,
-        #     anchor=W,
-        #     fg="#FFCAB1",
-        #     bg="#5F634F",
-        #     selectcolor="#000000",
-        # )
-        # self.am_checkbtn.pack(
-        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        # )
+        self._create_button('American Modern', self.am_checkbtn)
+
         self.pg_checkbtn = IntVar(self.root.frame)
-        self._create_button('Markel', self.pg_checkbtn)
-        # self.pg_checkbtn = Checkbutton(
-        #     self.root.frame,
-        #     relief="raised",
-        #     text="Progressive",
-        #     justify=CENTER,
-        #     anchor=W,
-        #     fg="#FFCAB1",
-        #     bg="#5F634F",
-        #     selectcolor="#000000",
-        # )
-        # self.pg_checkbtn.pack(
-        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        # )
+        self._create_button('Progressive', self.pg_checkbtn)
+
         self.sw_checkbtn = IntVar(self.root.frame)
-        self._create_button('Markel', self.sw_checkbtn)
-        # self.sw_checkbtn = Checkbutton(
-        #     self.root.frame,
-        #     relief="raised",
-        #     text="Seawave",
-        #     justify=CENTER,
-        #     anchor=W,
-        #     fg="#FFCAB1",
-        #     bg="#5F634F",
-        #     selectcolor="#000000",
-        # )
-        # self.sw_checkbtn.pack(
-        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        # )
+        self._create_button('Seawave', self.sw_checkbtn)
+
         self.km_checkbtn = IntVar(self.root.frame)
-        self._create_button('Markel', self.km_checkbtn)
-        # self.km_checkbtn = Checkbutton(
-        #     self.root.frame,
-        #     relief="raised",
-        #     text="Kemah Marine",
-        #     justify=CENTER,
-        #     anchor=W,
-        #     fg="#FFCAB1",
-        #     bg="#5F634F",
-        #     selectcolor="#000000",
-        # )
-        # self.km_checkbtn.pack(
-        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        # )
+        self._create_button('Kemah Marine', self.km_checkbtn)
+
         self.cp_checkbtn = IntVar(self.root.frame)
-        self._create_button('Markel', self.cp_checkbtn)
-        # self.cp_checkbtn = Checkbutton(
-        #     self.root.frame,
-        #     relief="raised",
-        #     text="Concept Special Risks",
-        #     justify=CENTER,
-        #     anchor=W,
-        #     fg="#FFCAB1",
-        #     bg="#5F634F",
-        #     selectcolor="#000000",
-        # )
-        # self.cp_checkbtn.pack(
-        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        # )
+        self._create_button('Concept Special Risks', self.cp_checkbtn)
+   
         self.nh_checkbtn = IntVar(self.root.frame)
-        self._create_button('Markel', self.nh_checkbtn)
-        # self.nh_checkbtn = Checkbutton(
-        #     self.root.frame,
-        #     relief="raised",
-        #     text="New Hampshire",
-        #     justify=CENTER,
-        #     anchor=W,
-        #     fg="#FFCAB1",
-        #     bg="#5F634F",
-        #     selectcolor="#000000",
-        # )
-        # self.nh_checkbtn.pack(
-        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        # )
+        self._create_button('New Hampshire', self.nh_checkbtn)
+
         self.In_checkbtn = IntVar(self.root.frame)
-        self._create_button('Markel', self.In_checkbtn)
-        # self.In_checkbtn = Checkbutton(
-        #     self.root.frame,
-        #     relief="raised",
-        #     text="Intact",
-        #     justify=CENTER,
-        #     anchor=W,
-        #     fg="#FFCAB1",
-        #     bg="#5F634F",
-        #     selectcolor="#000000",
-        # )
-        # self.In_checkbtn.pack(
-        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        # )
+        self._create_button('Intact', self.In_checkbtn)
+
         self.tv_checkbtn = IntVar(self.root.frame)
-        self._create_button('Markel', self.tv_checkbtn)
-        # self.tv_checkbtn = Checkbutton(
-        #     self.root.frame,
-        #     relief="raised",
-        #     text="Travelers",
-        #     justify=CENTER,
-        #     anchor=W,
-        #     fg="#FFCAB1",
-        #     bg="#5F634F",
-        #     selectcolor="#000000",
-        # )
-        # self.tv_checkbtn.pack(
-        #     fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
-        # )
+        self._create_button('Travelers', self.tv_checkbtn)
 
         allocate_btn = Button(
             master=self.root.frame,
@@ -482,8 +354,8 @@ class ExcelWorker:
         self,
         excel_entry: dict,
     ):
-        fname = excel_entry["fname"].capitalize()
-        lname = excel_entry["lname"].upper()
+        fname = excel_entry["fname"]
+        lname = excel_entry["lname"]
         self.name = " ".join([lname, fname])
         self.date = str(datetime.today()).split()[0]
         self.vessel_year = excel_entry["vessel_year"]
@@ -493,7 +365,7 @@ class ExcelWorker:
         self.referral = excel_entry["referral"]
         self.wb = load_workbook(TRACKER_PATH)
         month = self.get_current_month()
-        self.ws = self.wb[month]
+        self.wb.active = self.wb[month]
         self.markets = self._assign_markets()
 
     def get_current_month(self):
@@ -547,16 +419,16 @@ class ExcelWorker:
         return list_of_client_data
 
     def create_row(self, row_data: list) -> bool:
-        if self.ws.append(row_data):
-            if self._save_workbook():
-                return True
-            else:
-                return False
-        else:
-            return False
+        self.wb.active.append(row_data)
+        #     if self.save_workbook():
+        #         return True
+        #     else:
+        #         return False
+        # else:
+        #     return False
 
     def save_workbook(self):
-        self.wb.save(self.wb_path)
+        self.wb.save(self.wb)
 
 
 app = DirWatch()
