@@ -365,7 +365,7 @@ class ExcelWorker:
         self.referral = excel_entry["referral"]
         self.wb = load_workbook(TRACKER_PATH)
         month = self.get_current_month()
-        self.wb.active = self.wb[month]
+        self.ws = self.wb[month]
         self.markets = self._assign_markets()
 
     def get_current_month(self):
@@ -419,7 +419,7 @@ class ExcelWorker:
         return list_of_client_data
 
     def create_row(self, row_data: list) -> bool:
-        self.wb.active.append(row_data)
+        self.ws.append(row_data)
         #     if self.save_workbook():
         #         return True
         #     else:
@@ -428,7 +428,7 @@ class ExcelWorker:
         #     return False
 
     def save_workbook(self):
-        self.wb.save(self.wb)
+        self.wb.save(TRACKER_PATH)
 
 
 app = DirWatch()
