@@ -388,38 +388,19 @@ class ExcelWorker:
         month = datetime.now().month
         return months_of_the_year.get(month).upper()
 
-    # def _assign_markets(self) -> list:
-    #     list_of_markets = []
-    #     for dict_pair in self.markets:
-    #         for key, value in dict_pair:
-    #             if value == 1:
-    #                 list_of_markets.append(key)
-    #     return list_of_markets
-
-    # def create_entry_list(self) -> list:
-    #     list_of_client_data = (
-    #         [
-    #             "",
-    #             "",
-    #             "",
-    #             self.name,
-    #             self.date,
-    #             "",
-    #             self.vessel_year,
-    #             self.vessel,
-    #             self.markets,
-    #             "",
-    #             "",
-    #             "",
-    #             self.status,
-    #             self.referral,
-    #         ]
-    #     )
-    #     return list_of_client_data
+    def _assign_markets(self) -> list:
+        list_of_markets = []
+        for market in self.markets:
+            for key, value in market:
+                if value == 1:
+                    mrkt = key.upper()
+                    list_of_markets.append(mrkt)
+                elif value == 0:
+                    value = ''
+        return list_of_markets
 
     def create_row(self, row_data: list) -> bool:
         self.ws.range('A2:Y2').insert('down')
-
         self.ws['D2'].value = self.name
         self.ws['E2'].value = self.date
         self.ws['G2'].value = self.vessel_year
@@ -437,25 +418,16 @@ class ExcelWorker:
                 y = ''
         self.ws[I2].value = self.markets_list
         self.ws[J2].value = self.markets['ch']
-        self.ws[J2].value = self.markets['ch']
-        self.ws[J2].value = self.markets['ch']
-        self.ws[J2].value = self.markets['ch']
-        self.ws[J2].value = self.markets['ch']
-        self.ws[J2].value = self.markets['ch']
-        self.ws[J2].value = self.markets['ch']
-        self.ws[J2].value = self.markets['ch']
-            # "ch": self.ch_checkbtn.get(),
-            # "mk": self.mk_checkbtn.get(),
-            # "ai": self.ai_checkbtn.get(),
-            # "am": self.am_checkbtn.get(),
-            # "pg": self.pg_checkbtn.get(),
-            # "sw": self.sw_checkbtn.get(),
-            # "km": self.km_checkbtn.get(),
-            # "cp": self.cp_checkbtn.get(),
-            # "nh": self.nh_checkbtn.get(),
-            # "In": self.In_checkbtn.get(),
-            # "tv": self.tv_checkbtn.get(),
-        
+        self.ws[K2].value = self.markets['mk']
+        self.ws[L2].value = self.markets['ai']
+        self.ws[M2].value = self.markets['am']
+        self.ws[N2].value = self.markets['pg']
+        self.ws[O2].value = self.markets['sw']
+        self.ws[P2].value = self.markets['km']
+        self.ws[Q2].value = self.markets['cp']
+        self.ws[R2].value = self.markets['nh']
+        self.ws[S2].value = self.markets['In']
+        self.ws[T2].value = self.markets['tv']
 
     def save_workbook(self):
         self.wb.save(TRACKER_PATH)
