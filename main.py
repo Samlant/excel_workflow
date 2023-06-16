@@ -6,7 +6,7 @@ import string
 from tkinter import *
 from datetime import datetime
 
-from openpyxl import Workbook, load_workbook
+import xlwings as xw
 import fillpdf
 from fillpdf import fillpdfs
 
@@ -201,7 +201,8 @@ class DialogNewFile:
         else:
             self._create_folder()
             self.root.destroy()
-            self.run_quickdraw_app()
+            if self.run_quickdraw_app():
+                self._create_excel_entry()
 
     def _create_folder(self):
         file_name_list = os.path.splitext(self.file_name)
@@ -213,9 +214,6 @@ class DialogNewFile:
         path = os.path.join(QUOTES_FOLDER, self.dir_name)
         self.path = os.path.join(PATH_TO_WATCH, self.file_name)
         os.makedirs(path)
-        self._move_quoteform_to_folder(path)
-
-    def _move_quoteform_to_folder(self, path: str):
         shutil.move(self.path, path)
 
     def _create_excel_entry(self):
@@ -324,6 +322,7 @@ class DialogAllocateMarkets:
     def _process_market_choices(self):
         self.excel_entry['markets'] = self._return_markets()
         self.excel_entry['status'] = 'SUBMIT TO MRKTS'
+        self.root.destroy()
         self._create_excel_entry()
 
     def _return_markets(self):
@@ -361,11 +360,14 @@ class ExcelWorker:
         self.vessel_year = excel_entry["vessel_year"]
         self.vessel = excel_entry["vessel"]
         self.markets = excel_entry["markets"]
+        self.markets_list = []
         self.status = excel_entry["status"]
         self.referral = excel_entry["referral"]
-        self.wb = load_workbook(TRACKER_PATH)
-        month = self.get_current_month()
-        self.ws = self.wb[month]
+
+        self.wb = xw.Book(TRACKER_PATH)
+        #month = self.get_current_month()
+        #self.ws = self.wb[month]
+        self.ws = self.wb.active
         self.markets = self._assign_markets()
 
     def get_current_month(self):
@@ -386,46 +388,74 @@ class ExcelWorker:
         month = datetime.now().month
         return months_of_the_year.get(month).upper()
 
-    def _assign_markets(self) -> list:
-        list_of_markets = []
-        for key, value in self.markets:
-            if value == 1:
-                list_of_markets.append(value)
-            else:
-                list_of_markets.append("")
-        return list_of_markets
+    # def _assign_markets(self) -> list:
+    #     list_of_markets = []
+    #     for dict_pair in self.markets:
+    #         for key, value in dict_pair:
+    #             if value == 1:
+    #                 list_of_markets.append(key)
+    #     return list_of_markets
 
-    def create_entry_list(self) -> list:
-        list_of_client_data = (
-            [
-                "",
-                "",
-                "",
-                self.name,
-                self.date,
-                "",
-                self.vessel_year,
-                self.vessel,
-            ]
-            + self.markets
-            + [
-                "",
-                "",
-                "",
-                self.status,
-                self.referral,
-            ]
-        )
-        return list_of_client_data
+    # def create_entry_list(self) -> list:
+    #     list_of_client_data = (
+    #         [
+    #             "",
+    #             "",
+    #             "",
+    #             self.name,
+    #             self.date,
+    #             "",
+    #             self.vessel_year,
+    #             self.vessel,
+    #             self.markets,
+    #             "",
+    #             "",
+    #             "",
+    #             self.status,
+    #             self.referral,
+    #         ]
+    #     )
+    #     return list_of_client_data
 
     def create_row(self, row_data: list) -> bool:
-        self.ws.append(row_data)
-        #     if self.save_workbook():
-        #         return True
-        #     else:
-        #         return False
-        # else:
-        #     return False
+        self.ws.range('A2:Y2').insert('down')
+
+        self.ws['D2'].value = self.name
+        self.ws['E2'].value = self.date
+        self.ws['G2'].value = self.vessel_year
+        self.ws['H2'].value = self.vessel
+        self.ws['X2'].value = self.status
+        self.ws['Y2'].value = self.referral
+        self._assign_markets_to_sheet()
+        
+    def _assign_markets_to_sheet(self):
+        for x, y in self.markets.items():
+            if y == 1:
+                self.markets_list.append(x)
+                y = 'p'
+            else:
+                y = ''
+        self.ws[I2].value = self.markets_list
+        self.ws[J2].value = self.markets['ch']
+        self.ws[J2].value = self.markets['ch']
+        self.ws[J2].value = self.markets['ch']
+        self.ws[J2].value = self.markets['ch']
+        self.ws[J2].value = self.markets['ch']
+        self.ws[J2].value = self.markets['ch']
+        self.ws[J2].value = self.markets['ch']
+        self.ws[J2].value = self.markets['ch']
+            # "ch": self.ch_checkbtn.get(),
+            # "mk": self.mk_checkbtn.get(),
+            # "ai": self.ai_checkbtn.get(),
+            # "am": self.am_checkbtn.get(),
+            # "pg": self.pg_checkbtn.get(),
+            # "sw": self.sw_checkbtn.get(),
+            # "km": self.km_checkbtn.get(),
+            # "cp": self.cp_checkbtn.get(),
+            # "nh": self.nh_checkbtn.get(),
+            # "In": self.In_checkbtn.get(),
+            # "tv": self.tv_checkbtn.get(),
+        
 
     def save_workbook(self):
         self.wb.save(TRACKER_PATH)
