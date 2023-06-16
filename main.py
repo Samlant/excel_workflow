@@ -16,6 +16,7 @@ from fillpdf import fillpdfs
 HOME_DIR = os.path.expanduser( '~' )
 PATH_TO_WATCH = os.path.join(HOME_DIR, 'Novamar Insurance', 'Flordia Office Master - Documents') # Root of FL Office Shared Drive
 QUOTES_FOLDER = os.path.join(PATH_TO_WATCH, 'QUOTES New')
+RENEWALS_FOLDER = os.path.join(PATH_TO_WATCH, 'QUOTES Renewal')
 TRACKER_PATH = os.path.join(PATH_TO_WATCH, 'Trackers', '1MASTER 2023 QUOTE TRACKER.xlsx')
 ICON = os.path.join('resources', 'icon.ico')
 
@@ -68,6 +69,7 @@ class DialogNewFile:
         self.root.text_frame.pack(fill=BOTH, expand=True)
         self.root.btn_frame = Frame(self.root, bg="#CFEBDF")
         self.root.btn_frame.pack(fill=BOTH, expand=True, ipady=2)
+        self.submitted_quotes = False
         self._save_client_name()
         if os.path.splitext(self.file_name)[1] == ".pdf":
             self.get_PDF_values()
@@ -210,14 +212,19 @@ class DialogNewFile:
             self.dir_name = self.excel_entry["lname"] + ' ' + self.excel_entry["fname"]
         else:
             self.dir_name = file_name_list[0]
-        # dir_name = dir_name.split() #NOT needed FOR NOW as we will title files with client names ... for now
-        path = os.path.join(QUOTES_FOLDER, self.dir_name)
+        if self.excel_entry["referral"] == 'RENEWAL':
+            path = os.path.join(RENEWALS_FOLDER, self.dir_name)
+        else:
+            path = os.path.join(QUOTES_FOLDER, self.dir_name)
         self.path = os.path.join(PATH_TO_WATCH, self.file_name)
-        os.makedirs(path)
+        os.makedirs(path, exist_ok=True)
         shutil.move(self.path, path)
+        self.path = path
 
     def _create_excel_entry(self):
         excel = ExcelWorker(self.excel_entry)
+        if self.submitted_quotes == True:
+            excel.change_markets_to_pending()
         row_data = excel.create_entry_list()
         excel.create_row(row_data=row_data)
         excel.save_workbook()
@@ -229,6 +236,7 @@ class DialogNewFile:
         self.excel_entry['status'] = 'Pending with Underwriting'
         path = os.path.join(HOME_DIR, "AppData", "Sam_Programs", "QuickDraw.exe")
         subprocess.run([path], input=self.path, encoding="utf-8")
+        self.submitted_quotes = True
 
 
 class DialogAllocateMarkets:
@@ -255,34 +263,24 @@ class DialogAllocateMarkets:
         ).pack(fill=X, ipady=6)
         self.ch_checkbtn = IntVar(self.root.frame)
         self._create_button('Chubb', self.ch_checkbtn)
-
         self.mk_checkbtn = IntVar(self.root.frame)
         self._create_button('Markel', self.mk_checkbtn)
-
         self.ai_checkbtn = IntVar(self.root.frame)
         self._create_button('American Integrity', self.ai_checkbtn)
-
         self.am_checkbtn = IntVar(self.root.frame)
         self._create_button('American Modern', self.am_checkbtn)
-
         self.pg_checkbtn = IntVar(self.root.frame)
         self._create_button('Progressive', self.pg_checkbtn)
-
         self.sw_checkbtn = IntVar(self.root.frame)
         self._create_button('Seawave', self.sw_checkbtn)
-
         self.km_checkbtn = IntVar(self.root.frame)
         self._create_button('Kemah Marine', self.km_checkbtn)
-
         self.cp_checkbtn = IntVar(self.root.frame)
         self._create_button('Concept Special Risks', self.cp_checkbtn)
-   
         self.nh_checkbtn = IntVar(self.root.frame)
         self._create_button('New Hampshire', self.nh_checkbtn)
-
         self.In_checkbtn = IntVar(self.root.frame)
         self._create_button('Intact', self.In_checkbtn)
-
         self.tv_checkbtn = IntVar(self.root.frame)
         self._create_button('Travelers', self.tv_checkbtn)
 
@@ -356,20 +354,24 @@ class ExcelWorker:
         fname = excel_entry["fname"]
         lname = excel_entry["lname"]
         self.name = " ".join([lname, fname])
-        self.date = str(datetime.today()).split()[0]
+        self.date = self._get_current_date()
         self.vessel_year = excel_entry["vessel_year"]
         self.vessel = excel_entry["vessel"]
         self.markets = excel_entry["markets"]
-        self.markets_list = []
         self.status = excel_entry["status"]
         self.referral = excel_entry["referral"]
 
         self.wb = xw.Book(TRACKER_PATH)
-        #month = self.get_current_month()
-        #self.ws = self.wb[month]
-        self.ws = self.wb.active
-        self.markets = self._assign_markets()
+        month = self.get_current_month()
+        self.ws = self.wb.sheets(month)
+        self.markets_list = []
+        self.markets_list = self._assign_markets()
 
+    def _get_current_date(self) -> str:
+        current_date = datetime.now()
+        current_date = (f'{current_date.month}-{current_date.day}')
+        return current_date
+    
     def get_current_month(self):
         months_of_the_year = {
             1: "January",
@@ -390,13 +392,12 @@ class ExcelWorker:
 
     def _assign_markets(self) -> list:
         list_of_markets = []
-        for market in self.markets:
-            for key, value in market:
-                if value == 1:
-                    mrkt = key.upper()
-                    list_of_markets.append(mrkt)
-                elif value == 0:
-                    value = ''
+        for market, value in self.markets.items():
+            if value == 1:
+                mrkt = market.upper()
+                list_of_markets.append(mrkt)
+            elif value == 0:
+                value = ''
         return list_of_markets
 
     def create_row(self, row_data: list) -> bool:
@@ -409,25 +410,28 @@ class ExcelWorker:
         self.ws['Y2'].value = self.referral
         self._assign_markets_to_sheet()
         
-    def _assign_markets_to_sheet(self):
+    def change_markets_to_pending(self):
+        """Not currently used;  implement once QuickDraw is working."""
         for x, y in self.markets.items():
             if y == 1:
                 self.markets_list.append(x)
                 y = 'p'
             else:
                 y = ''
-        self.ws[I2].value = self.markets_list
-        self.ws[J2].value = self.markets['ch']
-        self.ws[K2].value = self.markets['mk']
-        self.ws[L2].value = self.markets['ai']
-        self.ws[M2].value = self.markets['am']
-        self.ws[N2].value = self.markets['pg']
-        self.ws[O2].value = self.markets['sw']
-        self.ws[P2].value = self.markets['km']
-        self.ws[Q2].value = self.markets['cp']
-        self.ws[R2].value = self.markets['nh']
-        self.ws[S2].value = self.markets['In']
-        self.ws[T2].value = self.markets['tv']
+        
+    def _assign_markets_to_sheet(self):
+        self.ws['I2'].value = self.markets_list
+        self.ws['J2'].value = self.markets['ch']
+        self.ws['K2'].value = self.markets['mk']
+        self.ws['L2'].value = self.markets['ai']
+        self.ws['M2'].value = self.markets['am']
+        self.ws['N2'].value = self.markets['pg']
+        self.ws['O2'].value = self.markets['sw']
+        self.ws['P2'].value = self.markets['km']
+        self.ws['Q2'].value = self.markets['cp']
+        self.ws['R2'].value = self.markets['nh']
+        self.ws['S2'].value = self.markets['In']
+        self.ws['T2'].value = self.markets['tv']
 
     def save_workbook(self):
         self.wb.save(TRACKER_PATH)
