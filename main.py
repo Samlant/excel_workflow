@@ -11,14 +11,17 @@ import fillpdf
 from fillpdf import fillpdfs
 
 
-
 # # Assuming CURRENT WORKING DIR is USER\APPDATA\LOCAL\SAM_PROGRAM
-HOME_DIR = os.path.expanduser( '~' )
-PATH_TO_WATCH = os.path.join(HOME_DIR, 'Novamar Insurance', 'Flordia Office Master - Documents') # Root of FL Office Shared Drive
-QUOTES_FOLDER = os.path.join(PATH_TO_WATCH, 'QUOTES New')
-RENEWALS_FOLDER = os.path.join(PATH_TO_WATCH, 'QUOTES Renewal')
-TRACKER_PATH = os.path.join(PATH_TO_WATCH, 'Trackers', '1MASTER 2023 QUOTE TRACKER.xlsx')
-ICON = os.path.join('resources', 'icon.ico')
+HOME_DIR = os.path.expanduser("~")
+PATH_TO_WATCH = os.path.join(
+    HOME_DIR, "Novamar Insurance", "Flordia Office Master - Documents"
+)  # Root of FL Office Shared Drive
+QUOTES_FOLDER = os.path.join(PATH_TO_WATCH, "QUOTES New")
+RENEWALS_FOLDER = os.path.join(PATH_TO_WATCH, "QUOTES Renewal")
+TRACKER_PATH = os.path.join(
+    PATH_TO_WATCH, "Trackers", "1MASTER 2023 QUOTE TRACKER.xlsx"
+)
+ICON = os.path.join("resources", "icon.ico")
 
 # Below is for testing-purposes only when the above shared drive is unavailable.
 # PATH_TO_WATCH = os.getcwd()
@@ -42,7 +45,7 @@ class DirWatch:
             added = [f for f in after if not f in before]
             if added:
                 new_file = added[0]
-                if os.path.splitext(new_file)[1] == ('.pdf' or '.docx'):
+                if os.path.splitext(new_file)[1] == (".pdf" or ".docx"):
                     dialog = DialogNewFile(new_file)
                     dialog.root.mainloop()
             before = dict([(f, None) for f in os.listdir(PATH_TO_WATCH)])
@@ -103,7 +106,7 @@ class DialogNewFile:
         self.excel_entry["vessel_year"] = pdf_dict.get(keys_dict["year"])
         referral = pdf_dict.get(keys_dict["referral"])
         self.excel_entry["referral"] = referral.upper()
-        self.excel_entry["status"] = 'ALLOCATE AND SUBMIT TO MRKTS'
+        self.excel_entry["status"] = "ALLOCATE AND SUBMIT TO MRKTS"
         # if any(chr.isdigit() for chr in self.excel_entry["vessel"]):
         #     self.excel_entry["length"] = pdf_dict.get(keys_dict["length"])
 
@@ -208,11 +211,11 @@ class DialogNewFile:
 
     def _create_folder(self):
         file_name_list = os.path.splitext(self.file_name)
-        if file_name_list[1] == '.pdf':
-            self.dir_name = self.excel_entry["lname"] + ' ' + self.excel_entry["fname"]
+        if file_name_list[1] == ".pdf":
+            self.dir_name = self.excel_entry["lname"] + " " + self.excel_entry["fname"]
         else:
             self.dir_name = file_name_list[0]
-        if self.excel_entry["referral"] == 'RENEWAL':
+        if self.excel_entry["referral"] == "RENEWAL":
             path = os.path.join(RENEWALS_FOLDER, self.dir_name)
         else:
             path = os.path.join(QUOTES_FOLDER, self.dir_name)
@@ -233,7 +236,7 @@ class DialogNewFile:
         dialog_allocate = DialogAllocateMarkets(self.excel_entry)
 
     def run_quickdraw_app(self):
-        self.excel_entry['status'] = 'Pending with Underwriting'
+        self.excel_entry["status"] = "Pending with Underwriting"
         path = os.path.join(HOME_DIR, "AppData", "Sam_Programs", "QuickDraw.exe")
         subprocess.run([path], input=self.path, encoding="utf-8")
         self.submitted_quotes = True
@@ -262,27 +265,27 @@ class DialogAllocateMarkets:
             fg="#5F634F",
         ).pack(fill=X, ipady=6)
         self.ch_checkbtn = IntVar(self.root.frame)
-        self._create_button('Chubb', self.ch_checkbtn)
+        self._create_button("Chubb", self.ch_checkbtn)
         self.mk_checkbtn = IntVar(self.root.frame)
-        self._create_button('Markel', self.mk_checkbtn)
+        self._create_button("Markel", self.mk_checkbtn)
         self.ai_checkbtn = IntVar(self.root.frame)
-        self._create_button('American Integrity', self.ai_checkbtn)
+        self._create_button("American Integrity", self.ai_checkbtn)
         self.am_checkbtn = IntVar(self.root.frame)
-        self._create_button('American Modern', self.am_checkbtn)
+        self._create_button("American Modern", self.am_checkbtn)
         self.pg_checkbtn = IntVar(self.root.frame)
-        self._create_button('Progressive', self.pg_checkbtn)
+        self._create_button("Progressive", self.pg_checkbtn)
         self.sw_checkbtn = IntVar(self.root.frame)
-        self._create_button('Seawave', self.sw_checkbtn)
+        self._create_button("Seawave", self.sw_checkbtn)
         self.km_checkbtn = IntVar(self.root.frame)
-        self._create_button('Kemah Marine', self.km_checkbtn)
+        self._create_button("Kemah Marine", self.km_checkbtn)
         self.cp_checkbtn = IntVar(self.root.frame)
-        self._create_button('Concept Special Risks', self.cp_checkbtn)
+        self._create_button("Concept Special Risks", self.cp_checkbtn)
         self.nh_checkbtn = IntVar(self.root.frame)
-        self._create_button('New Hampshire', self.nh_checkbtn)
+        self._create_button("New Hampshire", self.nh_checkbtn)
         self.In_checkbtn = IntVar(self.root.frame)
-        self._create_button('Intact', self.In_checkbtn)
+        self._create_button("Intact", self.In_checkbtn)
         self.tv_checkbtn = IntVar(self.root.frame)
-        self._create_button('Travelers', self.tv_checkbtn)
+        self._create_button("Travelers", self.tv_checkbtn)
 
         allocate_btn = Button(
             master=self.root.frame,
@@ -303,23 +306,22 @@ class DialogAllocateMarkets:
         )
 
     def _create_button(self, text: str, int_variable: IntVar):
-        x = Checkbutton(self.root.frame,
-               text=text,
-               variable=int_variable,
-               relief="raised",
-               justify=CENTER,
-               anchor=W,
-               fg="#FFCAB1",
-               bg="#5F634F",
-               selectcolor="#000000",
-            )
-        x.pack(
-            fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW
+        x = Checkbutton(
+            self.root.frame,
+            text=text,
+            variable=int_variable,
+            relief="raised",
+            justify=CENTER,
+            anchor=W,
+            fg="#FFCAB1",
+            bg="#5F634F",
+            selectcolor="#000000",
         )
+        x.pack(fill=X, expand=False, ipady=6, ipadx=10, pady=3, padx=10, anchor=NW)
 
     def _process_market_choices(self):
-        self.excel_entry['markets'] = self._return_markets()
-        self.excel_entry['status'] = 'SUBMIT TO MRKTS'
+        self.excel_entry["markets"] = self._return_markets()
+        self.excel_entry["status"] = "SUBMIT TO MRKTS"
         self.root.destroy()
         self._create_excel_entry()
 
@@ -369,9 +371,9 @@ class ExcelWorker:
 
     def _get_current_date(self) -> str:
         current_date = datetime.now()
-        current_date = (f'{current_date.month}-{current_date.day}')
+        current_date = f"{current_date.month}-{current_date.day}"
         return current_date
-    
+
     def get_current_month(self):
         months_of_the_year = {
             1: "January",
@@ -397,41 +399,41 @@ class ExcelWorker:
                 mrkt = market.upper()
                 list_of_markets.append(mrkt)
             elif value == 0:
-                value = ''
+                value = ""
         return list_of_markets
 
     def create_row(self, row_data: list) -> bool:
-        self.ws.range('A2:Y2').insert('down')
-        self.ws['D2'].value = self.name
-        self.ws['E2'].value = self.date
-        self.ws['G2'].value = self.vessel_year
-        self.ws['H2'].value = self.vessel
-        self.ws['X2'].value = self.status
-        self.ws['Y2'].value = self.referral
+        self.ws.range("A2:Y2").insert("down")
+        self.ws["D2"].value = self.name
+        self.ws["E2"].value = self.date
+        self.ws["G2"].value = self.vessel_year
+        self.ws["H2"].value = self.vessel
+        self.ws["X2"].value = self.status
+        self.ws["Y2"].value = self.referral
         self._assign_markets_to_sheet()
-        
+
     def change_markets_to_pending(self):
         """Not currently used;  implement once QuickDraw is working."""
         for x, y in self.markets.items():
             if y == 1:
                 self.markets_list.append(x)
-                y = 'p'
+                y = "p"
             else:
-                y = ''
-        
+                y = ""
+
     def _assign_markets_to_sheet(self):
-        self.ws['I2'].value = self.markets_list
-        self.ws['J2'].value = self.markets['ch']
-        self.ws['K2'].value = self.markets['mk']
-        self.ws['L2'].value = self.markets['ai']
-        self.ws['M2'].value = self.markets['am']
-        self.ws['N2'].value = self.markets['pg']
-        self.ws['O2'].value = self.markets['sw']
-        self.ws['P2'].value = self.markets['km']
-        self.ws['Q2'].value = self.markets['cp']
-        self.ws['R2'].value = self.markets['nh']
-        self.ws['S2'].value = self.markets['In']
-        self.ws['T2'].value = self.markets['tv']
+        self.ws["I2"].value = self.markets_list
+        self.ws["J2"].value = self.markets["ch"]
+        self.ws["K2"].value = self.markets["mk"]
+        self.ws["L2"].value = self.markets["ai"]
+        self.ws["M2"].value = self.markets["am"]
+        self.ws["N2"].value = self.markets["pg"]
+        self.ws["O2"].value = self.markets["sw"]
+        self.ws["P2"].value = self.markets["km"]
+        self.ws["Q2"].value = self.markets["cp"]
+        self.ws["R2"].value = self.markets["nh"]
+        self.ws["S2"].value = self.markets["In"]
+        self.ws["T2"].value = self.markets["tv"]
 
     def save_workbook(self):
         self.wb.save(TRACKER_PATH)
