@@ -38,6 +38,7 @@ pip-delete-this-directory.txt
 
 # Custom tests
 Trackers/
+tests/
 
 # Unit test / coverage reports
 htmlcov/

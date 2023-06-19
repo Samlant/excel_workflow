@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import subprocess
 import shutil
@@ -11,21 +12,39 @@ import fillpdf
 from fillpdf import fillpdfs
 
 
-# # Assuming CURRENT WORKING DIR is USER\APPDATA\LOCAL\SAM_PROGRAM
+# Assuming CURRENT WORKING DIR is USER\APPDATA\LOCAL\work_tools
 HOME_DIR = os.path.expanduser("~")
 PATH_TO_WATCH = os.path.join(
-    HOME_DIR, "Novamar Insurance", "Flordia Office Master - Documents"
-)  # Root of FL Office Shared Drive
-QUOTES_FOLDER = os.path.join(PATH_TO_WATCH, "QUOTES New")
-RENEWALS_FOLDER = os.path.join(PATH_TO_WATCH, "QUOTES Renewal")
-TRACKER_PATH = os.path.join(
-    PATH_TO_WATCH, "Trackers", "1MASTER 2023 QUOTE TRACKER.xlsx"
+    HOME_DIR,
+    "Novamar Insurance",
+    "Florida Office Master - Documents",
 )
-ICON = os.path.join("resources", "icon.ico")
+QUOTES_FOLDER = os.path.join(
+    PATH_TO_WATCH,
+    "QUOTES New",
+)
+RENEWALS_FOLDER = os.path.join(
+    PATH_TO_WATCH,
+    "QUOTES Renewal",
+)
+TRACKER_PATH = os.path.join(
+    PATH_TO_WATCH,
+    "Trackers",
+    "1MASTER 2023 QUOTE TRACKER.xlsx",
+)
+ICON_NAME = "icon.ico"
+if getattr(sys, "frozen", False):
+    application_path = sys._MEIPASS
+else:
+    application_path = os.path.dirname(os.path.abspath(__file__))
+
+ICON = os.path.join(application_path, "resources", ICON_NAME)
+print("icon path is ", ICON)
 
 # Below is for testing-purposes only when the above shared drive is unavailable.
-# PATH_TO_WATCH = os.getcwd()
+# PATH_TO_WATCH = os.path.join(os.getcwd(), "tests")
 # QUOTES_FOLDER = os.path.join(PATH_TO_WATCH, "QUOTES New")
+# RENEWALS_FOLDER = os.path.join(PATH_TO_WATCH, "QUOTES Renewals")
 # TRACKER_PATH = os.path.join(
 #     PATH_TO_WATCH,
 #     "Trackers",
@@ -228,8 +247,7 @@ class DialogNewFile:
         excel = ExcelWorker(self.excel_entry)
         if self.submitted_quotes == True:
             excel.change_markets_to_pending()
-        row_data = excel.create_entry_list()
-        excel.create_row(row_data=row_data)
+        excel.create_row()
         excel.save_workbook()
 
     def allocate_markets(self) -> dict:
@@ -237,7 +255,7 @@ class DialogNewFile:
 
     def run_quickdraw_app(self):
         self.excel_entry["status"] = "Pending with Underwriting"
-        path = os.path.join(HOME_DIR, "AppData", "Sam_Programs", "QuickDraw.exe")
+        path = os.path.join(HOME_DIR, "AppData", "work_tools", "QuickDraw.exe")
         subprocess.run([path], input=self.path, encoding="utf-8")
         self.submitted_quotes = True
 
@@ -343,8 +361,7 @@ class DialogAllocateMarkets:
 
     def _create_excel_entry(self):
         excel = ExcelWorker(self.excel_entry)
-        row_data = excel.create_entry_list()
-        excel.create_row(row_data=row_data)
+        excel.create_row()
         excel.save_workbook()
 
 
@@ -362,19 +379,19 @@ class ExcelWorker:
         self.markets = excel_entry["markets"]
         self.status = excel_entry["status"]
         self.referral = excel_entry["referral"]
-
+        self.app = xw.App(visible=False)
         self.wb = xw.Book(TRACKER_PATH)
-        month = self.get_current_month()
+        month = self._get_current_month()
         self.ws = self.wb.sheets(month)
-        self.markets_list = []
-        self.markets_list = self._assign_markets()
+        markets_list = self._assign_markets()
+        self.markets_list = self._list_to_str(markets_list)
 
     def _get_current_date(self) -> str:
         current_date = datetime.now()
         current_date = f"{current_date.month}-{current_date.day}"
         return current_date
 
-    def get_current_month(self):
+    def _get_current_month(self):
         months_of_the_year = {
             1: "January",
             2: "February",
@@ -398,11 +415,15 @@ class ExcelWorker:
             if value == 1:
                 mrkt = market.upper()
                 list_of_markets.append(mrkt)
-            elif value == 0:
-                value = ""
+                self.markets[market] = ""
+            else:
+                self.markets[market] = ""
         return list_of_markets
 
-    def create_row(self, row_data: list) -> bool:
+    def _list_to_str(self, list_data: list) -> str:
+        return ", ".join(list_data)
+
+    def create_row(self) -> bool:
         self.ws.range("A2:Y2").insert("down")
         self.ws["D2"].value = self.name
         self.ws["E2"].value = self.date
@@ -411,15 +432,7 @@ class ExcelWorker:
         self.ws["X2"].value = self.status
         self.ws["Y2"].value = self.referral
         self._assign_markets_to_sheet()
-
-    def change_markets_to_pending(self):
-        """Not currently used;  implement once QuickDraw is working."""
-        for x, y in self.markets.items():
-            if y == 1:
-                self.markets_list.append(x)
-                y = "p"
-            else:
-                y = ""
+        self.ws.range("A2:Y2").api.Borders.Weight = 1
 
     def _assign_markets_to_sheet(self):
         self.ws["I2"].value = self.markets_list
@@ -437,6 +450,16 @@ class ExcelWorker:
 
     def save_workbook(self):
         self.wb.save(TRACKER_PATH)
+        self.app.quit()
+
+    def change_markets_to_pending(self):
+        """Not currently used;  implement once QuickDraw is working."""
+        for x, y in self.markets.items():
+            if y == 1:
+                self.markets_list.append(x)
+                y = "p"
+            else:
+                y = ""
 
 
 app = DirWatch()
