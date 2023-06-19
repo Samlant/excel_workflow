@@ -38,8 +38,7 @@ if getattr(sys, "frozen", False):
 else:
     application_path = os.path.dirname(os.path.abspath(__file__))
 
-ICON = os.path.join(application_path, "resources", ICON_NAME)
-print("icon path is ", ICON)
+ICON = os.path.join(application_path, ICON_NAME)
 
 # Below is for testing-purposes only when the above shared drive is unavailable.
 # PATH_TO_WATCH = os.path.join(os.getcwd(), "tests")
@@ -240,7 +239,11 @@ class DialogNewFile:
             path = os.path.join(QUOTES_FOLDER, self.dir_name)
         self.path = os.path.join(PATH_TO_WATCH, self.file_name)
         os.makedirs(path, exist_ok=True)
-        shutil.move(self.path, path)
+        if not os.path.exists(path):
+            shutil.move(self.path, path)
+        elif os.path.exists(path):
+            os.remove(path)
+            shutil.move(self.path, path)
         self.path = path
 
     def _create_excel_entry(self):
