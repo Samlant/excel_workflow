@@ -17,7 +17,7 @@ HOME_DIR = os.path.expanduser("~")
 PATH_TO_WATCH = os.path.join(
     HOME_DIR,
     "Novamar Insurance",
-    "Florida Office Master - Documents",
+    "Flordia Office Master - Documents",
 )
 QUOTES_FOLDER = os.path.join(
     PATH_TO_WATCH,
