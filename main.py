@@ -12,23 +12,23 @@ import fillpdf
 from fillpdf import fillpdfs
 
 
-# Assuming CURRENT WORKING DIR is USER\APPDATA\LOCAL\work_tools
 HOME_DIR = os.path.expanduser("~")
-PATH_TO_WATCH = os.path.join(
+shared_drive = os.path.join(
     HOME_DIR,
     "Novamar Insurance",
     "Flordia Office Master - Documents",
 )
+PATH_TO_WATCH = shared_drive
 QUOTES_FOLDER = os.path.join(
-    PATH_TO_WATCH,
+    shared_drive,
     "QUOTES New",
 )
 RENEWALS_FOLDER = os.path.join(
-    PATH_TO_WATCH,
+    shared_drive,
     "QUOTES Renewal",
 )
 TRACKER_PATH = os.path.join(
-    PATH_TO_WATCH,
+    shared_drive,
     "Trackers",
     "1MASTER 2023 QUOTE TRACKER.xlsx",
 )
