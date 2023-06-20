@@ -1,4 +1,5 @@
 import os
+import stat
 import sys
 import time
 import subprocess
@@ -10,7 +11,6 @@ from datetime import datetime
 import xlwings as xw
 import fillpdf
 from fillpdf import fillpdfs
-
 
 HOME_DIR = os.path.expanduser("~")
 shared_drive = os.path.join(
@@ -32,11 +32,15 @@ TRACKER_PATH = os.path.join(
     "Trackers",
     "1MASTER 2023 QUOTE TRACKER.xlsx",
 )
+# program_location = r'%LOCALAPPDATA%\Work Tools'
 ICON_NAME = "icon.ico"
 if getattr(sys, "frozen", False):
     application_path = sys._MEIPASS
+    # if program_location not in sys.path:
+    #     sys.path.append(program_location)
 else:
     application_path = os.path.dirname(os.path.abspath(__file__))
+
 
 ICON = os.path.join(application_path, ICON_NAME)
 
@@ -239,10 +243,11 @@ class DialogNewFile:
             path = os.path.join(QUOTES_FOLDER, self.dir_name)
         self.path = os.path.join(PATH_TO_WATCH, self.file_name)
         os.makedirs(path, exist_ok=True)
-        if not os.path.exists(path):
+        if os.path.exists(path):
+            dir_name_revised = f"{self.dir_name}2"
+            path = os.path.join(QUOTES_FOLDER, dir_name_revised)
             shutil.move(self.path, path)
-        elif os.path.exists(path):
-            os.remove(path)
+        else:
             shutil.move(self.path, path)
         self.path = path
 
@@ -379,15 +384,19 @@ class ExcelWorker:
         self.date = self._get_current_date()
         self.vessel_year = excel_entry["vessel_year"]
         self.vessel = excel_entry["vessel"]
-        self.markets = excel_entry["markets"]
+        if "market" in excel_entry:
+            self.markets = excel_entry["markets"]
         self.status = excel_entry["status"]
         self.referral = excel_entry["referral"]
         self.app = xw.App(visible=False)
         self.wb = xw.Book(TRACKER_PATH)
         month = self._get_current_month()
         self.ws = self.wb.sheets(month)
-        markets_list = self._assign_markets()
-        self.markets_list = self._list_to_str(markets_list)
+        if "market" in excel_entry:
+            markets_list = self._assign_markets()
+            self.markets_list = self._list_to_str(markets_list)
+        elif "market" not in excel_entry:
+            self.markets_list = 'null'
 
     def _get_current_date(self) -> str:
         current_date = datetime.now()
@@ -438,18 +447,21 @@ class ExcelWorker:
         self.ws.range("A2:Y2").api.Borders.Weight = 1
 
     def _assign_markets_to_sheet(self):
-        self.ws["I2"].value = self.markets_list
-        self.ws["J2"].value = self.markets["ch"]
-        self.ws["K2"].value = self.markets["mk"]
-        self.ws["L2"].value = self.markets["ai"]
-        self.ws["M2"].value = self.markets["am"]
-        self.ws["N2"].value = self.markets["pg"]
-        self.ws["O2"].value = self.markets["sw"]
-        self.ws["P2"].value = self.markets["km"]
-        self.ws["Q2"].value = self.markets["cp"]
-        self.ws["R2"].value = self.markets["nh"]
-        self.ws["S2"].value = self.markets["In"]
-        self.ws["T2"].value = self.markets["tv"]
+        if self.markets_list == 'null':
+            pass
+        elif self.markets_list != 'null':
+            self.ws["I2"].value = self.markets_list
+            self.ws["J2"].value = self.markets["ch"]
+            self.ws["K2"].value = self.markets["mk"]
+            self.ws["L2"].value = self.markets["ai"]
+            self.ws["M2"].value = self.markets["am"]
+            self.ws["N2"].value = self.markets["pg"]
+            self.ws["O2"].value = self.markets["sw"]
+            self.ws["P2"].value = self.markets["km"]
+            self.ws["Q2"].value = self.markets["cp"]
+            self.ws["R2"].value = self.markets["nh"]
+            self.ws["S2"].value = self.markets["In"]
+            self.ws["T2"].value = self.markets["tv"]
 
     def save_workbook(self):
         self.wb.save(TRACKER_PATH)
