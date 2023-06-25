@@ -11,6 +11,8 @@ from datetime import datetime
 import xlwings as xw
 import fillpdf
 from fillpdf import fillpdfs
+import PIL.Image
+import pystray
 
 HOME_DIR = os.path.expanduser("~")
 shared_drive = os.path.join(
@@ -32,8 +34,9 @@ TRACKER_PATH = os.path.join(
     "Trackers",
     "1MASTER 2023 QUOTE TRACKER.xlsx",
 )
-# program_location = r'%LOCALAPPDATA%\Work Tools'
+
 ICON_NAME = "icon.ico"
+
 if getattr(sys, "frozen", False):
     application_path = sys._MEIPASS
     # if program_location not in sys.path:
@@ -41,8 +44,27 @@ if getattr(sys, "frozen", False):
 else:
     application_path = os.path.dirname(os.path.abspath(__file__))
 
-
 ICON = os.path.join(application_path, ICON_NAME)
+
+image = PIL.Image.open(ICON)
+
+
+def on_clicked(icon, item):
+    if str(item) == "Open ReadMe":
+        print("Opening Readme!")
+    elif str(item) == "Exit":
+        systray_icon.stop()
+        sys.exit()
+
+
+systray_icon = pystray.Icon(
+    "Intake Tool",
+    image,
+    menu=pystray.Menu(
+        pystray.MenuItem("Open ReadMe", on_clicked),
+        pystray.MenuItem("Exit", on_clicked),
+    ),
+)
 
 # Below is for testing-purposes only when the above shared drive is unavailable.
 # PATH_TO_WATCH = os.path.join(os.getcwd(), "tests")
@@ -351,7 +373,8 @@ class DialogAllocateMarkets:
         self.root.destroy()
         self._create_excel_entry()
 
-    def _return_markets(self):
+    def _return_markets(self) -> dict:
+        """Retrieves all market options and whether the user wants to submit to those markets within a dict."""
         dict_of_markets = {
             "ch": self.ch_checkbtn.get(),
             "mk": self.mk_checkbtn.get(),
@@ -374,10 +397,7 @@ class DialogAllocateMarkets:
 
 
 class ExcelWorker:
-    def __init__(
-        self,
-        excel_entry: dict,
-    ):
+    def __init__(self, excel_entry: dict):
         fname = excel_entry["fname"]
         lname = excel_entry["lname"]
         self.name = " ".join([lname, fname])
@@ -396,7 +416,7 @@ class ExcelWorker:
             markets_list = self._assign_markets()
             self.markets_list = self._list_to_str(markets_list)
         elif "market" not in excel_entry:
-            self.markets_list = 'null'
+            self.markets_list = "null"
 
     def _get_current_date(self) -> str:
         current_date = datetime.now()
@@ -447,21 +467,26 @@ class ExcelWorker:
         self.ws.range("A2:Y2").api.Borders.Weight = 1
 
     def _assign_markets_to_sheet(self):
-        if self.markets_list == 'null':
+        if self.markets_list == "null":
             pass
-        elif self.markets_list != 'null':
+        elif self.markets_list != "null":
             self.ws["I2"].value = self.markets_list
-            self.ws["J2"].value = self.markets["ch"]
-            self.ws["K2"].value = self.markets["mk"]
-            self.ws["L2"].value = self.markets["ai"]
-            self.ws["M2"].value = self.markets["am"]
-            self.ws["N2"].value = self.markets["pg"]
-            self.ws["O2"].value = self.markets["sw"]
-            self.ws["P2"].value = self.markets["km"]
-            self.ws["Q2"].value = self.markets["cp"]
-            self.ws["R2"].value = self.markets["nh"]
-            self.ws["S2"].value = self.markets["In"]
-            self.ws["T2"].value = self.markets["tv"]
+        """Below commented out section is for when we integrate QuickDraw 
+        successfully.  These lines will allocate "P" to show that those submitted 
+        markets are "Pending with UW".  No other use because we do not use a designation to show that markets need to be submitted,  other than the
+        Status column.
+        """
+        # self.ws["J2"].value = self.markets["ch"]
+        # self.ws["K2"].value = self.markets["mk"]
+        # self.ws["L2"].value = self.markets["ai"]
+        # self.ws["M2"].value = self.markets["am"]
+        # self.ws["N2"].value = self.markets["pg"]
+        # self.ws["O2"].value = self.markets["sw"]
+        # self.ws["P2"].value = self.markets["km"]
+        # self.ws["Q2"].value = self.markets["cp"]
+        # self.ws["R2"].value = self.markets["nh"]
+        # self.ws["S2"].value = self.markets["In"]
+        # self.ws["T2"].value = self.markets["tv"]
 
     def save_workbook(self):
         self.wb.save(TRACKER_PATH)
@@ -478,3 +503,4 @@ class ExcelWorker:
 
 
 app = DirWatch()
+systray_icon.run_detached()
