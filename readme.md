@@ -21,7 +21,7 @@ This tool expedites and simplifies intaking new or renewal clients by automatica
 | :clinking_glasses:   | Automatically creates an entry in our excel tracking report.                                                                                                                                                                           |
 | :clinking_glasses:   | Allows you to allocate markets right off the bat---if so,  it includes those markets in the tracker.                                                                                                                                  |
 | :clinking_glasses:   | Also allows you to immeidately submit the client into markets, if desired.                                                                                                                                                                                                  |
-| :clinking_glasses:   | Displays an icon within the System Tray in the bottom-right                                                                                                                                                                                               |
+| :clinking_glasses:   | Displays an icon within the System Tray in the bottom-right corner |
 
 ## Installation
 
