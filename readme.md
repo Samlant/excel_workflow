@@ -16,11 +16,11 @@ This tool expedites and simplifies intaking new or renewal clients by automatica
 
 | :black_small_square: | Feature List                                                                                                                                                                                                                                                                                                               |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| :clinking_glasses:   | Fully cross-platform.                                                                                                                                                                       |
-| :clinking_glasses:   | automatically detects if the quoteform is for a new client or a renewal.                                                                                                                                                                                                                                                |
-| :clinking_glasses:   | Automatically creates an entry in our excel tracking report.                                                                                                                                                                           |
-| :clinking_glasses:   | Allows you to allocate markets right off the bat---if so,  it includes those markets in the tracker.                                                                                                                                  |
-| :clinking_glasses:   | Also allows you to immeidately submit the client into markets, if desired.                                                                                                                                                                                                  |
+| :clinking_glasses:   | Fully cross-platform.    |
+| :clinking_glasses:   | automatically detects if the quoteform is for a new client or a renewal.        |
+| :clinking_glasses:   | Automatically creates an entry in our excel tracking report.         |
+| :clinking_glasses:   | Allows you to allocate markets right off the bat---if so,  it includes those markets in the tracker.           |
+| :clinking_glasses:   | Also allows you to immeidately submit the client into markets, if desired.          |
 | :clinking_glasses:   | Displays an icon within the System Tray in the bottom-right corner |
 
 ## Installation
