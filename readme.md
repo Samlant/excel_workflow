@@ -1,7 +1,7 @@
 
 # IntakeTool
-
-Expedites and simplifies intaking new or renewal clients by automatically organizing their file, adding them to our tracker, and, optionally, allows you to allocate markets or submit to them in one fell swoop.
+[![E6-B76-AE1-3407-4-BB7-8-D7-F-159613-FC9-C7-D.png](https://i.postimg.cc/GmPY2yGJ/E6-B76-AE1-3407-4-BB7-8-D7-F-159613-FC9-C7-D.png)](https://postimg.cc/sMX1H1nv)
+Expedites and simplifies intaking new or renewal clients by automatically organizing their file, adding them to our tracker, and---optionally---allows you to allocate markets or submit to them in one fell swoop.
 
 
 ## FAQ
@@ -42,5 +42,5 @@ For support or any questions, email sam@novamar.net
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE4MDM5MzI1NV19
+eyJoaXN0b3J5IjpbMjExMDc3NTkzNSwtMTgwMzkzMjU1XX0=
 -->
