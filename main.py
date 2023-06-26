@@ -254,24 +254,41 @@ class DialogNewFile:
                 self._create_excel_entry()
 
     def _create_folder(self):
+        self._assign_dir_name()
+        
+        if self._check_if_renewal():
+            path = os.path.join(RENEWALS_FOLDER, self.dir_name)
+            if os.path.exists(path):
+                revised_dir_name = f"{self.dir_name}-2"
+                path = os.path.join(RENEWALS_FOLDER, revised_dir_name)
+        else:
+            path = os.path.join(QUOTES_FOLDER, self.dir_name)
+            if os.path.exists(path):
+                revised_dir_name = f"{self.dir_name}-2"
+                path = os.path.join(QUOTES_FOLDER, revised_dir_name)
+
+        self.path = os.path.join(PATH_TO_WATCH, self.file_name)
+
+        os.makedirs(path, exist_ok=True)
+        save_path = os.path.join(path, self.file_name)
+        shutil.move(self.path, save_path)
+        self.path = save_path
+
+    def _assign_dir_name(self):
         file_name_list = os.path.splitext(self.file_name)
         if file_name_list[1] == ".pdf":
             self.dir_name = self.excel_entry["lname"] + " " + self.excel_entry["fname"]
         else:
-            self.dir_name = file_name_list[0]
-        if self.excel_entry["referral"] == "RENEWAL":
-            path = os.path.join(RENEWALS_FOLDER, self.dir_name)
+            file_name = file_name_list[0].split()
+            fname = file_name[1].upper()
+            lname = string.capwords(file_name[0])
+            self.dir_name = f"{lname} {fname}"
+
+    def _check_if_renewal(self) -> bool:
+        if "RENEWAL" in self.excel_entry["referral"]:
+            return True
         else:
-            path = os.path.join(QUOTES_FOLDER, self.dir_name)
-        self.path = os.path.join(PATH_TO_WATCH, self.file_name)
-        os.makedirs(path, exist_ok=True)
-        if os.path.exists(path):
-            dir_name_revised = f"{self.dir_name}2"
-            path = os.path.join(QUOTES_FOLDER, dir_name_revised)
-            shutil.move(self.path, path)
-        else:
-            shutil.move(self.path, path)
-        self.path = path
+            return False
 
     def _create_excel_entry(self):
         excel = ExcelWorker(self.excel_entry)
