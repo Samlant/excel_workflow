@@ -1,0 +1,53 @@
+Full-fledged and Completed App, inclusive of proper documentation:
+pyi-makespec --add-data 'resources\configurations.ini' --add-data 'resources\icon.ico;.' --add-data 'README.pdf;.' --add-data 'LICENSE.txt;.' --noconsole --additional-hooks-dir 'resources\hook-tkinterdnd2.py' main.py
+
+
+QUICKDRAW SETTINGS:
+------------------------------------------
+pyi-makespec --name QuickDraw --noconsole --paths '..\\..\\..\\virtualenvs\\QuickDraw\\Liv\\site-packages' --specpath '../pkging' --additional-hooks-dir '.' --add-data 'resources\configurations.ini;.' --add-data 'resources\icon.ico;.' --add-data 'README.md;.' --add-data 'LICENSE.txt;.' main.py
+
+pyi-makespec --name QuickDraw --noconsole --paths '..\..\..\virtualenvs\QuickDraw\Lib\site-packages' --specpath '../pkging' --additional-hooks-dir '.' --add-data '..\resources\configurations.ini;.' --add-data '..\source\resources\icon.ico;.' --add-data '..\source\README.md;.' --add-data '..\source\LICENSE.txt;.' main.py 
+
+pyi-makespec --name QuickDraw --noconsole --paths '..\..\..\virtualenvs\QuickDraw\Lib\site-packages' --specpath '../pkging' --additional-hooks-dir '.' --add-data '..\resources\configurations.ini;.' --add-data '..\source\resources\icon.ico;.' --add-data '..\source\README.md;.' --add-data '..\source\LICENSE.txt;.' main.py
+
+Make a local spec file insid ethe source dir:
+pyi-makespec --name QuickDraw --noconsole --paths '..\..\..\virtualenvs\QuickDraw\Lib\site-packages' --additional-hooks-dir '.' --add-data 'resources\configurations.ini;.' --add-data 'resources\icon.ico;.' --add-data 'README.md;.' --add-data 'LICENSE.txt;.' main.py model.py view.py presenter.py
+
+
+add all py files dir to pathex! only dir, not each file...
+
+
+INTAKETOOL SETTINGS:
+------------------------------------------
+IntakeTool command to create .spec file:
+pyi-makespec --name 'IntakeTool' --noconsole --paths '..\\..\\..\\virtualenvs\\IntakeTool\\Lib\\site-packages' --add-data '..\\source\\resources\\icon.ico;.' --add-data '..\\source\\LICENSE.txt;.' --additional-hooks-dir '.' --specpath '../pkging' main.py
+
+
+IntakeTool command to compile from .spec file (depends on CWD!):
+pyinstaller --noconfirm --clean --workpath '..\pkging\build' --distpath '..\pkging\dist' ..\pkging\IntakeTool.spec
+
+
+GENERAL NOTES:
+------------------------------------------
+Can only use the following when making .spec file:
+usage: pyi-makespec [-h] [-D] [-F] [--specpath DIR] [-n NAME] [--add-data <SRC;DEST or SRC:DEST>] [--add-binary <SRC;DEST or SRC:DEST>] [-p DIR] [--hidden-import MODULENAME] [--collect-submodules MODULENAME]
+                    [--collect-data MODULENAME] [--collect-binaries MODULENAME] [--collect-all MODULENAME] [--copy-metadata PACKAGENAME] [--recursive-copy-metadata PACKAGENAME] [--additional-hooks-dir HOOKSPATH]
+                    [--runtime-hook RUNTIME_HOOKS] [--exclude-module EXCLUDES] [--splash IMAGE_FILE] [-d {all,imports,bootloader,noarchive}] [--python-option PYTHON_OPTION] [-s] [--noupx] [--upx-exclude FILE] [-c] [-w]
+                    [-i <FILE.ico or FILE.exe,ID or FILE.icns or Image or "NONE">] [--disable-windowed-traceback] [--version-file FILE] [-m <FILE or XML>] [--no-embed-manifest] [-r RESOURCE] [--uac-admin] [--uac-uiaccess]       
+                    [--win-private-assemblies] [--win-no-prefer-redirects] [--argv-emulation] [--osx-bundle-identifier BUNDLE_IDENTIFIER] [--target-architecture ARCH] [--codesign-identity IDENTITY]
+                    [--osx-entitlements-file FILENAME] [--runtime-tmpdir PATH] [--bootloader-ignore-signals] [--log-level LEVEL]
+                    scriptname [scriptname ...]
+
+
+Can only use the following when compiling from a .spec file:
+usage: pyinstaller [-h] [-v] [-D] [-F] [--specpath DIR] [-n NAME] [--add-data <SRC;DEST or SRC:DEST>] [--add-binary <SRC;DEST or SRC:DEST>] [-p DIR] [--hidden-import MODULENAME] [--collect-submodules MODULENAME]
+                   [--collect-data MODULENAME] [--collect-binaries MODULENAME] [--collect-all MODULENAME] [--copy-metadata PACKAGENAME] [--recursive-copy-metadata PACKAGENAME] [--additional-hooks-dir HOOKSPATH]
+                   [--runtime-hook RUNTIME_HOOKS] [--exclude-module EXCLUDES] [--splash IMAGE_FILE] [-d {all,imports,bootloader,noarchive}] [--python-option PYTHON_OPTION] [-s] [--noupx] [--upx-exclude FILE] [-c] [-w]
+                   [-i <FILE.ico or FILE.exe,ID or FILE.icns or Image or "NONE">] [--disable-windowed-traceback] [--version-file FILE] [-m <FILE or XML>] [--no-embed-manifest] [-r RESOURCE] [--uac-admin] [--uac-uiaccess]        
+                   [--win-private-assemblies] [--win-no-prefer-redirects] [--argv-emulation] [--osx-bundle-identifier BUNDLE_IDENTIFIER] [--target-architecture ARCH] [--codesign-identity IDENTITY]
+                   [--osx-entitlements-file FILENAME] [--runtime-tmpdir PATH] [--bootloader-ignore-signals] [--distpath DIR] [--workpath WORKPATH] [-y] [--upx-dir UPX_DIR] [-a] [--clean] [--log-level LEVEL]
+                   scriptname [scriptname ...]
+
+
+
+
