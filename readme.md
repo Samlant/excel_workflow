@@ -1,6 +1,6 @@
 
 # IntakeTool
-[![E6-B76-AE1-3407-4-BB7-8-D7-F-159613-FC9-C7-D.png](https://i.postimg.cc/GmPY2yGJ/E6-B76-AE1-3407-4-BB7-8-D7-F-159613-FC9-C7-D.png)](https://postimg.cc/sMX1H1nv)
+![Logo](https://i.postimg.cc/GmPY2yGJ/E6-B76-AE1-3407-4-BB7-8-D7-F-159613-FC9-C7-D.png)
 
 This tool expedites and simplifies intaking new or renewal clients by automatically organizing their file, adding them to our tracker, and---optionally---allows you to allocate markets (and submit to them) in one fell swoop.
 
