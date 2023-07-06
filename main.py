@@ -35,6 +35,16 @@ TRACKER_PATH = os.path.join(
     "1MASTER 2023 QUOTE TRACKER.xlsx",
 )
 
+# Below is for testing-purposes only when the above shared drive is unavailable.
+# PATH_TO_WATCH = os.path.join(os.getcwd(), "test")
+# QUOTES_FOLDER = os.path.join(PATH_TO_WATCH, "QUOTES New")
+# RENEWALS_FOLDER = os.path.join(PATH_TO_WATCH, "QUOTES Renewal")
+# TRACKER_PATH = os.path.join(
+#     PATH_TO_WATCH,
+#     "Trackers",
+#     "1MASTER 2023 QUOTE TRACKER.xlsx",
+# )
+
 ICON_NAME = "icon.ico"
 
 if getattr(sys, "frozen", False):
@@ -48,10 +58,12 @@ ICON = os.path.join(application_path, ICON_NAME)
 
 image = PIL.Image.open(ICON)
 
+README_FILE = os.path.join(HOME_DIR, "AppData", "Local", "work-tools", "README.txt")
+
 
 def on_clicked(icon, item):
     if str(item) == "Open ReadMe":
-        print("Opening Readme!")
+        os.startfile(README_FILE)
     elif str(item) == "Exit":
         systray_icon.stop()
         sys.exit()
@@ -65,16 +77,6 @@ systray_icon = pystray.Icon(
         pystray.MenuItem("Exit", on_clicked),
     ),
 )
-
-# Below is for testing-purposes only when the above shared drive is unavailable.
-# PATH_TO_WATCH = os.path.join(os.getcwd(), "tests")
-# QUOTES_FOLDER = os.path.join(PATH_TO_WATCH, "QUOTES New")
-# RENEWALS_FOLDER = os.path.join(PATH_TO_WATCH, "QUOTES Renewals")
-# TRACKER_PATH = os.path.join(
-#     PATH_TO_WATCH,
-#     "Trackers",
-#     "1MASTER 2023 QUOTE TRACKER.xlsx",
-# )
 
 
 class DirWatch:
@@ -255,7 +257,7 @@ class DialogNewFile:
 
     def _create_folder(self):
         self._assign_dir_name()
-        
+
         if self._check_if_renewal():
             path = os.path.join(RENEWALS_FOLDER, self.dir_name)
             if os.path.exists(path):
@@ -425,15 +427,15 @@ class ExcelWorker:
             self.markets = excel_entry["markets"]
         self.status = excel_entry["status"]
         self.referral = excel_entry["referral"]
-        self.app = xw.App(visible=False)
-        self.wb = xw.Book(TRACKER_PATH)
         month = self._get_current_month()
-        self.ws = self.wb.sheets(month)
         if "market" in excel_entry:
             markets_list = self._assign_markets()
             self.markets_list = self._list_to_str(markets_list)
         elif "market" not in excel_entry:
             self.markets_list = "null"
+        self.app = xw.App(visible=False)
+        self.wb = xw.Book(TRACKER_PATH)
+        self.ws = self.wb.sheets(month)
 
     def _get_current_date(self) -> str:
         current_date = datetime.now()
@@ -456,7 +458,8 @@ class ExcelWorker:
             12: "December",
         }
         month = datetime.now().month
-        return months_of_the_year.get(month).upper()
+        month = months_of_the_year.get(month).upper()
+        return month
 
     def _assign_markets(self) -> list:
         list_of_markets = []
@@ -493,17 +496,6 @@ class ExcelWorker:
         markets are "Pending with UW".  No other use because we do not use a designation to show that markets need to be submitted,  other than the
         Status column.
         """
-        # self.ws["J2"].value = self.markets["ch"]
-        # self.ws["K2"].value = self.markets["mk"]
-        # self.ws["L2"].value = self.markets["ai"]
-        # self.ws["M2"].value = self.markets["am"]
-        # self.ws["N2"].value = self.markets["pg"]
-        # self.ws["O2"].value = self.markets["sw"]
-        # self.ws["P2"].value = self.markets["km"]
-        # self.ws["Q2"].value = self.markets["cp"]
-        # self.ws["R2"].value = self.markets["nh"]
-        # self.ws["S2"].value = self.markets["In"]
-        # self.ws["T2"].value = self.markets["tv"]
 
     def save_workbook(self):
         self.wb.save(TRACKER_PATH)
